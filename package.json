@@ -7,7 +7,6 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
-    "reset-data": "node src/reset-data.js",
     "admin:hash": "node src/generate-admin-password-hash.js"
   },
   "dependencies": {
