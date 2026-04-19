@@ -1,0 +1,17 @@
+{
+  "name": "officino-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local activation API + download website for Officino",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "admin:hash": "node src/generate-admin-password-hash.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

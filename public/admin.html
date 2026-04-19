@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Officino Admin</title>
+  <link rel="stylesheet" href="/bootstrap.min.css" />
+  <link rel="stylesheet" href="/admin.css" />
+</head>
+<body>
+  <main class="admin-shell" id="adminShell">
+    <aside class="admin-sidebar d-none" id="adminSidebar">
+      <a href="/" class="brand mb-4">
+        <span class="brand-mark">O</span>
+        <span>Officino</span>
+      </a>
+      <div class="nav-pill active">License Management</div>
+      <div class="nav-pill">Activation</div>
+      <div class="nav-pill">Devices</div>
+      <div class="nav-pill">Logs</div>
+      <button class="btn btn-outline-dark" id="adminLogoutBtn" type="button">Logout</button>
+      <div class="sidebar-foot">Admin Panel</div>
+    </aside>
+
+    <section class="admin-content" id="adminContent">
+      <section class="auth-panel card shadow-sm mb-4" id="adminAuthCard">
+        <div class="card-body p-4">
+          <h1 class="h3 mb-2">Admin Login</h1>
+          <p class="text-muted mb-4">Sign in with your secure admin account to manage licenses.</p>
+          <form id="adminLoginForm" class="row g-3" autocomplete="off">
+            <div class="col-12">
+              <label class="form-label fw-semibold" for="adminUsernameInput">Username</label>
+              <input id="adminUsernameInput" class="form-control form-control-lg" placeholder="Enter username" />
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" for="adminPasswordInput">Password</label>
+              <input id="adminPasswordInput" class="form-control form-control-lg" type="password" placeholder="Enter password" />
+            </div>
+            <div class="col-12 d-grid d-md-flex justify-content-md-end">
+              <button class="btn btn-primary btn-lg px-4" id="adminLoginBtn" type="submit">Sign In</button>
+            </div>
+          </form>
+          <div id="adminAuthResult" class="small text-danger mt-2"></div>
+        </div>
+      </section>
+
+      <section class="d-none" id="adminListCard">
+        <div class="stats-grid mb-4">
+          <article class="stat-card total">
+            <div class="stat-title">Total Licenses</div>
+            <div class="stat-value" id="statTotal">0</div>
+          </article>
+          <article class="stat-card valid">
+            <div class="stat-title">Valid Licenses</div>
+            <div class="stat-value" id="statValid">0</div>
+          </article>
+          <article class="stat-card renew">
+            <div class="stat-title">Devices In Use</div>
+            <div class="stat-value" id="statInUse">0</div>
+          </article>
+          <article class="stat-card expired">
+            <div class="stat-title">Deactivated</div>
+            <div class="stat-value" id="statDeactivated">0</div>
+          </article>
+        </div>
+
+        <section class="card shadow-sm main-list-card">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h2 class="h5 mb-0">License Tracker</h2>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-secondary" id="refreshLicensesBtn" type="button">Refresh</button>
+              <button class="btn btn-primary" id="openManagerBtn" type="button">Add License</button>
+            </div>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 admin-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Key Last 4</th>
+                    <th>Status</th>
+                    <th>Devices</th>
+                    <th>Max</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="licensesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal fade" id="managerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">License Manager</h5>
+          <button type="button" class="btn-close" id="closeManagerModalBtn" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createLicenseForm" class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Customer Name</label>
+              <input id="customerName" class="form-control" placeholder="Client name" required />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Max Devices</label>
+              <input id="maxDevices" class="form-control" type="number" min="1" value="1" required />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes (optional)</label>
+              <input id="notes" class="form-control" placeholder="Any note..." />
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+              <button class="btn btn-primary" type="submit">Generate Activation Key</button>
+            </div>
+          </form>
+          <div id="adminCreateResult" class="alert alert-light border mt-3 mb-0 small d-none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="licenseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">License Details</h5>
+          <button type="button" class="btn-close" id="closeLicenseModalBtn" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6"><div class="detail-card"><span class="label">Customer</span><span id="dCustomer" class="value">-</span></div></div>
+            <div class="col-md-6"><div class="detail-card"><span class="label">Status</span><span id="dStatus" class="value">-</span></div></div>
+            <div class="col-md-6"><div class="detail-card"><span class="label">Activation Key</span><span id="dKey" class="value">-</span></div></div>
+            <div class="col-md-6"><div class="detail-card"><span class="label">Max Devices</span><span id="dMax" class="value">-</span></div></div>
+            <div class="col-md-6"><div class="detail-card"><span class="label">Created</span><span id="dCreated" class="value">-</span></div></div>
+            <div class="col-md-6"><div class="detail-card"><span class="label">Notes</span><span id="dNotes" class="value">-</span></div></div>
+          </div>
+
+          <h6 class="mb-2">Activated Devices</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Computer Name</th>
+                  <th>Machine ID</th>
+                  <th>First IP</th>
+                  <th>Last IP</th>
+                  <th>Activated At</th>
+                  <th>Last Seen</th>
+                </tr>
+              </thead>
+              <tbody id="deviceRows"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" id="activateLicenseBtn" type="button">Activate Key</button>
+          <button class="btn btn-danger" id="deactivateLicenseBtn" type="button">Deactivate Key</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/bootstrap.bundle.min.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>
