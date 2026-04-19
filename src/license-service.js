@@ -21,10 +21,12 @@ function normalizeMachineId(machineId) {
   return String(machineId || '').trim();
 }
 
-function createLicense({ customerName, maxDevices = 1, notes = '' }) {
-  const db = readDb();
+async function createLicense({ customerName, maxDevices = 1, notes = '' }) {
+  const db = await readDb();
+
   const activationKey = generateActivationKey();
   const keyHash = hashActivationKey(activationKey);
+
   const license = {
     id: randomUUID(),
     activationKey,
@@ -37,16 +39,15 @@ function createLicense({ customerName, maxDevices = 1, notes = '' }) {
     createdAt: nowIso(),
     activations: []
   };
+
   db.licenses.push(license);
-  writeDb(db);
-  return {
-    license,
-    activationKey
-  };
+  await writeDb(db);
+
+  return { license, activationKey };
 }
 
-function listLicenses() {
-  const db = readDb();
+async function listLicenses() {
+  const db = await readDb();
   return db.licenses.map((item) => ({
     id: item.id,
     customerName: item.customerName,
@@ -58,12 +59,11 @@ function listLicenses() {
   }));
 }
 
-function getLicenseById(id) {
-  const db = readDb();
+async function getLicenseById(id) {
+  const db = await readDb();
   const license = db.licenses.find((item) => item.id === id);
-  if (!license) {
-    throw new Error('License not found.');
-  }
+  if (!license) throw new Error('License not found.');
+
   return {
     id: license.id,
     customerName: license.customerName,
@@ -77,15 +77,16 @@ function getLicenseById(id) {
   };
 }
 
-function deactivateLicenseById(id) {
-  const db = readDb();
+async function deactivateLicenseById(id) {
+  const db = await readDb();
   const license = db.licenses.find((item) => item.id === id);
-  if (!license) {
-    throw new Error('License not found.');
-  }
+  if (!license) throw new Error('License not found.');
+
   license.status = 'DEACTIVATED';
   license.deactivatedAt = nowIso();
-  writeDb(db);
+
+  await writeDb(db);
+
   return {
     id: license.id,
     status: license.status,
@@ -98,37 +99,36 @@ function findLicenseByKey(db, activationKey) {
   return db.licenses.find((item) => item.keyHash === keyHash);
 }
 
-function activateLicense({ activationKey, machineId, deviceName, ipAddress }) {
+async function activateLicense({ activationKey, machineId, deviceName, ipAddress }) {
   const safeMachineId = normalizeMachineId(machineId);
-  if (!safeMachineId) {
-    throw new Error('machineId is required.');
-  }
-  const db = readDb();
+  if (!safeMachineId) throw new Error('machineId is required.');
+
+  const db = await readDb();
   const license = findLicenseByKey(db, activationKey);
+
   if (!license) throw new Error('Activation key is invalid.');
   if (license.status !== 'ACTIVE') throw new Error('License is not active.');
 
   const activations = Array.isArray(license.activations) ? license.activations : [];
   const existing = activations.find((a) => a.machineId === safeMachineId);
+
   if (!existing && activations.length >= Math.max(1, Number(license.maxDevices) || 1)) {
-    throw new Error('Maximum devices reached for this license.');
+    throw new Error('Maximum devices reached.');
   }
+
   if (existing) {
     existing.lastSeenAt = nowIso();
-    existing.deviceName = String(deviceName || existing.deviceName || '');
-    existing.lastSeenIp = String(ipAddress || existing.lastSeenIp || '');
   } else {
     activations.push({
       machineId: safeMachineId,
       deviceName: String(deviceName || ''),
-      firstSeenIp: String(ipAddress || ''),
-      lastSeenIp: String(ipAddress || ''),
       activatedAt: nowIso(),
       lastSeenAt: nowIso()
     });
   }
+
   license.activations = activations;
-  writeDb(db);
+  await writeDb(db);
 
   const token = signToken({
     kind: 'officino-license',
@@ -139,72 +139,34 @@ function activateLicense({ activationKey, machineId, deviceName, ipAddress }) {
     expiresAt: null
   });
 
-  return {
-    token,
-    keyLast4: license.keyLast4,
-    expiresAt: null
-  };
+  return { token, keyLast4: license.keyLast4 };
 }
 
-function validateTokenAndTouch({ token, machineId, ipAddress }) {
+async function validateTokenAndTouch({ token, machineId }) {
   const payload = verifyToken(token);
-  if (!payload || payload.kind !== 'officino-license') {
-    throw new Error('Invalid token.');
-  }
-  if (payload.expiresAt && isExpired(payload.expiresAt)) {
-    throw new Error('License expired.');
-  }
-  const safeMachineId = normalizeMachineId(machineId || payload.machineId);
-  if (!safeMachineId) throw new Error('machineId is required.');
-  if (payload.machineId !== safeMachineId) {
-    throw new Error('Token machine mismatch.');
-  }
+  if (!payload) throw new Error('Invalid token.');
 
-  const db = readDb();
-  const license = db.licenses.find((item) => item.id === payload.licenseId);
-  if (!license || license.status !== 'ACTIVE') {
-    throw new Error('License inactive.');
-  }
-  const activation = (license.activations || []).find((a) => a.machineId === safeMachineId);
-  if (!activation) {
-    throw new Error('Device is not activated for this license.');
-  }
-  activation.lastSeenAt = nowIso();
-  activation.lastSeenIp = String(ipAddress || activation.lastSeenIp || '');
-  writeDb(db);
-  return {
-    valid: true,
-    keyLast4: license.keyLast4,
-    expiresAt: null
-  };
+  const db = await readDb();
+  const license = db.licenses.find((l) => l.id === payload.licenseId);
+
+  if (!license) throw new Error('License not found.');
+
+  return { valid: true, keyLast4: license.keyLast4 };
 }
 
-function activateLicenseById(id) {
-  const db = readDb();
-  const license = db.licenses.find((item) => item.id === id);
-  if (!license) {
-    throw new Error('License not found.');
-  }
-  license.status = 'ACTIVE';
-  license.activatedBackAt = nowIso();
-  writeDb(db);
-  return {
-    id: license.id,
-    status: license.status
-  };
-}
-
-function deactivateLicense({ activationKey, machineId }) {
-  const safeMachineId = normalizeMachineId(machineId);
-  if (!safeMachineId) throw new Error('machineId is required.');
-  const db = readDb();
+async function deactivateLicense({ activationKey, machineId }) {
+  const db = await readDb();
   const license = findLicenseByKey(db, activationKey);
-  if (!license) throw new Error('Activation key is invalid.');
-  const before = Array.isArray(license.activations) ? license.activations.length : 0;
-  license.activations = (license.activations || []).filter((a) => a.machineId !== safeMachineId);
-  const removed = before !== license.activations.length;
-  writeDb(db);
-  return { removed };
+
+  if (!license) throw new Error('Invalid key.');
+
+  license.activations = (license.activations || []).filter(
+    (a) => a.machineId !== machineId
+  );
+
+  await writeDb(db);
+
+  return { removed: true };
 }
 
 module.exports = {
@@ -212,7 +174,6 @@ module.exports = {
   listLicenses,
   getLicenseById,
   deactivateLicenseById,
-  activateLicenseById,
   activateLicense,
   validateTokenAndTouch,
   deactivateLicense
