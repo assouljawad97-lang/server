@@ -11,17 +11,24 @@
   <header class="site-header">
     <div class="container-xl d-flex align-items-center justify-content-between py-3">
       <a href="#" class="brand">
-        <span class="brand-mark">O</span>
+        <span>
+          <img src="/logo.png" alt="Officino" width="50px" height="50px"  />
+        </span>
         <span class="brand-text">Officino</span>
       </a>
       <nav class="d-none d-md-flex gap-4 nav-links">
-        <a href="#features">Features</a>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#contact">Support</a>
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#how-it-works" data-i18n="nav.howItWorks">How It Works</a>
+        <a href="#contact" data-i18n="nav.support">Support</a>
       </nav>
-      <div class="d-flex gap-2">
-        <a id="downloadWindows" class="btn btn-primary" href="#" target="_blank" rel="noopener">Windows</a>
-        <a id="downloadMac" class="btn btn-outline-primary" href="#" target="_blank" rel="noopener">macOS</a>
+      <div class="d-flex gap-2 align-items-center header-actions">
+        <select id="langSelect" class="form-select form-select-sm lang-select" aria-label="Language">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="ar">Arabic</option>
+        </select>
+        <a id="downloadWindows" class="btn btn-primary" href="#" target="_blank" rel="noopener" data-i18n="buttons.windows">Windows</a>
+        <a id="downloadMac" class="btn btn-outline-primary" href="#" target="_blank" rel="noopener" data-i18n="buttons.mac">macOS</a>
       </div>
     </div>
   </header>
@@ -31,23 +38,23 @@
       <div class="container-xl">
         <div class="row align-items-center g-4">
           <div class="col-lg-6">
-            <p class="hero-kicker">Office workflow made simple</p>
-            <h1 class="hero-title">Administrative desktop software for fast, secure daily work.</h1>
-            <p class="hero-text">Manage clients, applications, scans, documents, and activation from one clean platform designed for real offices.</p>
+            <p class="hero-kicker" data-i18n="hero.kicker">Office workflow made simple</p>
+            <h1 class="hero-title" data-i18n="hero.title">Administrative desktop software for fast, secure daily work.</h1>
+            <p class="hero-text" data-i18n="hero.text">Manage clients, applications, scans, documents, and activation from one clean platform designed for real offices.</p>
             <div class="d-flex flex-wrap gap-2">
-              <a id="downloadWindowsHero" class="btn btn-dark btn-lg" href="#" target="_blank" rel="noopener">Download for Windows</a>
-              <a id="downloadMacHero" class="btn btn-light btn-lg border" href="#" target="_blank" rel="noopener">Download for macOS</a>
+              <a id="downloadWindowsHero" class="btn btn-dark btn-lg" href="#" target="_blank" rel="noopener" data-i18n="buttons.downloadWindows">Download for Windows</a>
+              <a id="downloadMacHero" class="btn btn-light btn-lg border" href="#" target="_blank" rel="noopener" data-i18n="buttons.downloadMac">Download for macOS</a>
             </div>
           </div>
           <div class="col-lg-6">
             <div class="hero-card">
-              <h2>What You Get</h2>
+              <h2 data-i18n="heroCard.title">What You Get</h2>
               <ul>
-                <li>Offline-first desktop app</li>
-                <li>Scanner support (WIA/TWAIN + network)</li>
-                <li>PDF tools and client history</li>
-                <li>LAN sync with host/guest modes</li>
-                <li>Activation and license validation</li>
+                <li data-i18n="heroCard.li1">Offline-first desktop app</li>
+                <li data-i18n="heroCard.li2">Scanner support (WIA/TWAIN + network)</li>
+                <li data-i18n="heroCard.li3">PDF tools and client history</li>
+                <li data-i18n="heroCard.li4">LAN sync with host/guest modes</li>
+                <li data-i18n="heroCard.li5">Activation and license validation</li>
               </ul>
             </div>
           </div>
@@ -58,16 +65,16 @@
     <section id="features" class="section-block">
       <div class="container-xl">
         <div class="section-head text-center">
-          <h2>Amazing features to make your work easier</h2>
-          <p>Everything your office needs to process files quickly and accurately.</p>
+          <h2 data-i18n="features.title">Amazing features to make your work easier</h2>
+          <p data-i18n="features.subtitle">Everything your office needs to process files quickly and accurately.</p>
         </div>
         <div class="feature-grid">
-          <article class="feature-item"><h3>Client Management</h3><p>Track each customer with full application history and statuses.</p></article>
-          <article class="feature-item"><h3>Smart Document Flow</h3><p>Import, preview, scan, and manage files from one place.</p></article>
-          <article class="feature-item"><h3>PDF Productivity</h3><p>Merge, compress, crop, split, and convert with simple tools.</p></article>
-          <article class="feature-item"><h3>LAN Collaboration</h3><p>Run host/guest mode so your team works from one shared source.</p></article>
-          <article class="feature-item"><h3>Activation Security</h3><p>License key checks with admin control for activate/deactivate.</p></article>
-          <article class="feature-item"><h3>Built for Real Offices</h3><p>Fast interface, clear steps, and multilingual support.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f1Title">Client Management</h3><p data-i18n="features.f1Text">Track each customer with full application history and statuses.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f2Title">Smart Document Flow</h3><p data-i18n="features.f2Text">Import, preview, scan, and manage files from one place.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f3Title">PDF Productivity</h3><p data-i18n="features.f3Text">Merge, compress, crop, split, and convert with simple tools.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f4Title">LAN Collaboration</h3><p data-i18n="features.f4Text">Run host/guest mode so your team works from one shared source.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f5Title">Activation Security</h3><p data-i18n="features.f5Text">License key checks with admin control for activate/deactivate.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f6Title">Built for Real Offices</h3><p data-i18n="features.f6Text">Fast interface, clear steps, and multilingual support.</p></article>
         </div>
       </div>
     </section>
@@ -75,21 +82,21 @@
     <section id="how-it-works" class="section-block alt">
       <div class="container-xl">
         <div class="section-head text-center">
-          <h2>How it Works</h2>
-          <p>Simple flow for your team from installation to daily work.</p>
+          <h2 data-i18n="how.title">How it Works</h2>
+          <p data-i18n="how.subtitle">Simple flow for your team from installation to daily work.</p>
         </div>
         <div class="steps-grid">
           <article class="step-card">
-            <h3>Install the App</h3>
-            <p>Download and install on your office computers.</p>
+            <h3 data-i18n="how.s1Title">Install the App</h3>
+            <p data-i18n="how.s1Text">Download and install on your office computers.</p>
           </article>
           <article class="step-card">
-            <h3>Setup and Activate</h3>
-            <p>Choose mode, configure folders, and activate your license key.</p>
+            <h3 data-i18n="how.s2Title">Setup and Activate</h3>
+            <p data-i18n="how.s2Text">Choose mode, configure folders, and activate your license key.</p>
           </article>
           <article class="step-card">
-            <h3>Start Working</h3>
-            <p>Manage clients, scan files, and keep operations organized.</p>
+            <h3 data-i18n="how.s3Title">Start Working</h3>
+            <p data-i18n="how.s3Text">Manage clients, scan files, and keep operations organized.</p>
           </article>
         </div>
       </div>
@@ -98,12 +105,27 @@
     <section id="contact" class="section-block">
       <div class="container-xl">
         <div class="section-head text-center">
-          <h2>Let’s Stay Connected</h2>
-          <p>Need setup help or activation support? We’re ready to assist.</p>
+          <h2 data-i18n="contact.title">Let's Stay Connected</h2>
+          <p data-i18n="contact.subtitle">Need setup help or activation support? We’re ready to assist.</p>
         </div>
-        <div class="contact-card text-center">
-          <p class="mb-2">WhatsApp: <a href="https://wa.me/34642190408" target="_blank" rel="noopener">+34 642 190 408</a></p>
-          <p class="mb-4">Email: <a href="mailto:assouljawad823@gmail.com">assouljawad823@gmail.com</a></p>
+        <div class="contact-card">
+          <div class="row g-3 align-items-stretch">
+            <div class="col-md-6">
+              <article class="contact-item">
+                <h3 data-i18n="contact.whatsappTitle">WhatsApp Support</h3>
+                <p class="mb-2" data-i18n="contact.whatsappText">Fast reply for setup and activation questions.</p>
+                <a class="btn btn-success" href="https://wa.me/34642190408" target="_blank" rel="noopener" data-i18n="contact.whatsappAction">Chat on WhatsApp</a>
+              </article>
+            </div>
+            <div class="col-md-6">
+              <article class="contact-item">
+                <h3 data-i18n="contact.emailTitle">Email Support</h3>
+                <p class="mb-2" data-i18n="contact.emailText">Send screenshots or detailed issues by email.</p>
+                <a class="btn btn-outline-primary" href="mailto:assouljawad823@gmail.com" data-i18n="contact.emailAction">Send Email</a>
+              </article>
+            </div>
+          </div>
+          <p class="contact-note mt-3 mb-0" data-i18n="contact.note">Support contact: +34 642 190 408 · assouljawad823@gmail.com</p>
         </div>
       </div>
     </section>
@@ -111,10 +133,10 @@
 
   <footer class="site-footer">
     <div class="container-xl d-flex flex-column flex-lg-row justify-content-between gap-2 py-3">
-      <span>© <span id="yearNow"></span> Officino. All rights reserved.</span>
+      <span>© <span id="yearNow"></span> Officino. <span data-i18n="footer.rights">All rights reserved.</span></span>
       <div class="d-flex gap-3">
-        <span>Privacy Policy</span>
-        <span>Terms and Conditions</span>
+        <span data-i18n="footer.privacy">Privacy Policy</span>
+        <span data-i18n="footer.terms">Terms and Conditions</span>
       </div>
     </div>
   </footer>

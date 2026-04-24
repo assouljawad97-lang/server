@@ -1,8 +1,35 @@
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/IBMPlexSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Kufi Arabic";
+  src: url("/fonts/NotoKufiArabic-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
   margin: 0;
-  font-family: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  direction: ltr;
+  font-family: "IBM Plex Sans", "Noto Kufi Arabic", "Segoe UI", Arial, sans-serif;
   color: #0f1a3a;
   background: #f5f7fb;
+}
+
+html[lang="ar"] body {
+  direction: rtl;
+  font-family: "Noto Kufi Arabic", "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+}
+
+html[lang="en"] body,
+html[lang="es"] body {
+  font-family: "IBM Plex Sans", "Noto Kufi Arabic", "Segoe UI", Arial, sans-serif;
 }
 
 .site-header {
@@ -48,6 +75,11 @@ body {
 
 .nav-links a:hover {
   color: #4b5fe5;
+}
+
+.lang-select {
+  min-width: 120px;
+  font-weight: 600;
 }
 
 .hero-section {
@@ -164,6 +196,29 @@ body {
   box-shadow: 0 10px 30px rgba(23, 40, 89, 0.06);
 }
 
+.contact-item {
+  background: #f8faff;
+  border: 1px solid #dfe7fb;
+  border-radius: 12px;
+  padding: 1rem;
+  height: 100%;
+}
+
+.contact-item h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.contact-item p {
+  color: #5d6a8a;
+}
+
+.contact-note {
+  color: #4d5a7d;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
 .contact-card a {
   text-decoration: none;
 }
@@ -176,5 +231,14 @@ body {
 @media (max-width: 768px) {
   .hero-section {
     padding-top: 42px;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .lang-select {
+    min-width: 110px;
   }
 }
