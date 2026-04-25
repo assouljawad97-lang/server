@@ -16,6 +16,12 @@ const {
   deactivateLicense,
   unbindActivationById
 } = require('./license-service');
+const {
+  createOrder,
+  listOrders,
+  respondToOrder
+} = require('./order-service');
+const { isMailConfigured, sendOrderEmail } = require('./mailer');
 const { logServerEvent, readServerLogs, getLogInfo } = require('./server-logger');
 
 const app = express();
@@ -67,6 +73,41 @@ function sanitizeText(value, maxLen) {
   return cleaned.slice(0, maxLen);
 }
 
+function normalizeEmail(value) {
+  const email = sanitizeText(value, 160).toLowerCase();
+  if (!email) return '';
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return '';
+  return email;
+}
+
+function normalizePhone(value) {
+  const raw = sanitizeText(value, 40).replace(/[^\d+()\-\s]/g, '');
+  const compact = raw.replace(/\s+/g, '');
+  if (compact.length < 6) return '';
+  return raw;
+}
+
+function normalizeName(value, maxLen = 80) {
+  return sanitizeText(value, maxLen).replace(/[^a-zA-ZÀ-ÿ\u0600-\u06FF' -]/g, '').trim();
+}
+
+const orderThrottle = new Map();
+
+function canSubmitOrder(ipAddress) {
+  const key = String(ipAddress || 'unknown');
+  const now = Date.now();
+  const existing = orderThrottle.get(key) || [];
+  const kept = existing.filter((ts) => now - ts < 10 * 60 * 1000);
+  if (kept.length >= 10) {
+    orderThrottle.set(key, kept);
+    return false;
+  }
+  kept.push(now);
+  orderThrottle.set(key, kept);
+  return true;
+}
+
 function normalizeLicensePayload(input) {
   const customerName = sanitizeText(input?.customerName, 120);
   const notes = sanitizeText(input?.notes, 500);
@@ -102,8 +143,40 @@ app.get('/api/meta', (req, res) => {
   });
 });
 
+app.post('/api/orders', async (req, res) => {
+  try {
+    const ipAddress = parseIpAddress(req);
+    if (!canSubmitOrder(ipAddress)) {
+      return res.status(429).json({ ok: false, message: 'Too many requests. Please try again later.' });
+    }
+
+    const firstName = normalizeName(req.body?.firstName, 80);
+    const lastName = normalizeName(req.body?.lastName, 80);
+    const email = normalizeEmail(req.body?.email);
+    const phone = normalizePhone(req.body?.phone);
+    const honeypot = String(req.body?.website || '').trim();
+    if (honeypot) {
+      return res.status(400).json({ ok: false, message: 'Invalid request.' });
+    }
+    if (!firstName || !lastName || !email || !phone) {
+      return res.status(400).json({ ok: false, message: 'First name, last name, email, and phone are required.' });
+    }
+
+    const order = await createOrder({ firstName, lastName, email, phone });
+    logServerEvent('INFO', 'order received', { orderId: order.id, email: order.email });
+    return res.json({ ok: true, orderId: order.id });
+  } catch (error) {
+    logServerEvent('ERROR', 'create order failed', error);
+    return res.status(400).json({ ok: false, message: error.message || 'Order failed.' });
+  }
+});
+
 app.get('/admin', (req, res) => {
   res.sendFile(path.resolve(process.cwd(), 'public', 'admin.html'));
+});
+
+app.get('/order', (req, res) => {
+  res.sendFile(path.resolve(process.cwd(), 'public', 'order.html'));
 });
 
 app.post('/api/admin/login', (req, res) => {
@@ -179,6 +252,80 @@ app.get('/api/admin/licenses', requireAdmin, async (req, res) => {
   } catch (error) {
     logServerEvent('ERROR', 'admin licenses list failed', error);
     res.status(500).json({ ok: false, message: 'Failed to load licenses.' });
+  }
+});
+
+app.get('/api/admin/orders', requireAdmin, async (req, res) => {
+  try {
+    const orders = await listOrders();
+    res.json({ ok: true, orders });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin orders list failed', error);
+    res.status(500).json({ ok: false, message: 'Failed to load orders.' });
+  }
+});
+
+app.post('/api/admin/orders/:id/respond', requireAdmin, async (req, res) => {
+  try {
+    const orderId = String(req.params.id || '').trim();
+    const subject = sanitizeText(req.body?.subject, 200);
+    const message = sanitizeText(req.body?.message, 4000);
+    const activationKey = sanitizeText(req.body?.activationKey, 120);
+    if (!subject || !message) {
+      return res.status(400).json({ ok: false, message: 'Subject and message are required.' });
+    }
+    if (!isMailConfigured()) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Email service is not configured. Please set SMTP env values.'
+      });
+    }
+
+    const orders = await listOrders();
+    const order = orders.find((item) => String(item.id) === orderId);
+    if (!order || !order.email) {
+      return res.status(404).json({ ok: false, message: 'Order email was not found.' });
+    }
+
+    let emailMeta = null;
+    let emailStatus = 'FAILED';
+    let emailError = '';
+    try {
+      emailMeta = await sendOrderEmail({
+        to: order.email,
+        subject,
+        message,
+        activationKey
+      });
+      emailStatus = 'SENT';
+    } catch (sendError) {
+      emailStatus = 'FAILED';
+      emailError = String(sendError?.message || 'Send failed.');
+    }
+
+    const result = await respondToOrder({
+      orderId,
+      adminUser: req.adminSession.username,
+      subject,
+      message,
+      activationKey,
+      emailStatus,
+      emailError,
+      emailMeta
+    });
+    logServerEvent('INFO', 'order responded', { orderId, by: req.adminSession.username });
+    if (emailStatus !== 'SENT') {
+      return res.json({
+        ok: true,
+        ...result,
+        emailStatus,
+        emailError: emailError || 'SMTP error.'
+      });
+    }
+    res.json({ ok: true, ...result, emailStatus });
+  } catch (error) {
+    logServerEvent('ERROR', 'order response failed', error);
+    res.status(400).json({ ok: false, message: error.message || 'Failed to respond to order.' });
   }
 });
 

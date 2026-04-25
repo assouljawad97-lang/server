@@ -162,6 +162,27 @@ body {
   word-break: break-word;
 }
 
+.order-summary {
+  border: 1px solid #d7deec;
+  border-radius: 10px;
+  background: #f6f8fd;
+  padding: 10px 12px;
+}
+
+.order-summary > div {
+  color: #111827;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+#orderResponseHistory .history-item {
+  border: 1px solid #d7deec;
+  border-radius: 10px;
+  background: #f8faff;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+
 @media (max-width: 992px) {
   .admin-shell {
     grid-template-columns: 1fr;

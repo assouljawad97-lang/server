@@ -228,6 +228,20 @@ html[lang="es"] body {
   color: #edf1ff;
 }
 
+.order-page-wrap {
+  background: radial-gradient(circle at 20% 20%, #e7edff 0%, #f5f7fb 55%);
+  min-height: calc(100vh - 140px);
+}
+
+.order-card {
+  width: min(760px, 100%);
+  border: 1px solid #dbe3f3;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 1.75rem;
+  box-shadow: 0 14px 36px rgba(23, 40, 89, 0.10);
+}
+
 @media (max-width: 768px) {
   .hero-section {
     padding-top: 42px;
@@ -240,5 +254,9 @@ html[lang="es"] body {
 
   .lang-select {
     min-width: 110px;
+  }
+
+  .order-card {
+    padding: 1.15rem;
   }
 }

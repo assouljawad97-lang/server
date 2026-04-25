@@ -1,1 +1,21 @@
 {"ts":"2026-04-25T14:33:49.868Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
+{"ts":"2026-04-25T19:58:38.294Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
+{"ts":"2026-04-25T19:59:29.883Z","level":"INFO","message":"order received","meta":{"orderId":"54b0167b-255b-4eec-843d-368d0eccf491","email":"assouljawad97@gmail.com"}}
+{"ts":"2026-04-25T20:00:30.593Z","level":"INFO","message":"order responded","meta":{"orderId":"54b0167b-255b-4eec-843d-368d0eccf491","by":"admin"}}
+{"ts":"2026-04-25T20:00:54.080Z","level":"INFO","message":"order responded","meta":{"orderId":"54b0167b-255b-4eec-843d-368d0eccf491","by":"admin"}}
+{"ts":"2026-04-25T20:01:28.352Z","level":"INFO","message":"order responded","meta":{"orderId":"54b0167b-255b-4eec-843d-368d0eccf491","by":"admin"}}
+{"ts":"2026-04-25T20:20:48.222Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
+{"ts":"2026-04-25T20:21:42.738Z","level":"INFO","message":"order received","meta":{"orderId":"d5ab1309-b828-4cb6-a052-05d7281bdab8","email":"assouljawad97@gmail.com"}}
+{"ts":"2026-04-25T20:23:13.544Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
+{"ts":"2026-04-25T20:23:34.128Z","level":"INFO","message":"order responded","meta":{"orderId":"d5ab1309-b828-4cb6-a052-05d7281bdab8","by":"admin"}}
+{"ts":"2026-04-25T22:31:54.692Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
+{"ts":"2026-04-25T22:35:41.370Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
+{"ts":"2026-04-25T22:36:34.248Z","level":"INFO","message":"order received","meta":{"orderId":"a055735d-3bf7-4c3a-bbdb-e1abced44629","email":"testeamil@gmail.com"}}
+{"ts":"2026-04-25T22:39:05.692Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
+{"ts":"2026-04-25T22:40:10.152Z","level":"INFO","message":"order responded","meta":{"orderId":"a055735d-3bf7-4c3a-bbdb-e1abced44629","by":"admin"}}
+{"ts":"2026-04-25T22:43:18.621Z","level":"INFO","message":"order received","meta":{"orderId":"50625a30-4754-4332-9658-dc2c2786ee62","email":"email@gmail.com"}}
+{"ts":"2026-04-25T22:43:42.467Z","level":"INFO","message":"order received","meta":{"orderId":"66236ee6-8da9-466e-84c2-1cc236ff1f63","email":"assouljawad97@gmail.com"}}
+{"ts":"2026-04-25T22:53:00.191Z","level":"INFO","message":"order received","meta":{"orderId":"b818e018-7139-48a1-8e7c-5829752cd0d1","email":"assouljawad97@gmail.com"}}
+{"ts":"2026-04-25T22:53:21.679Z","level":"INFO","message":"order responded","meta":{"orderId":"b818e018-7139-48a1-8e7c-5829752cd0d1","by":"admin"}}
+{"ts":"2026-04-25T23:02:29.198Z","level":"INFO","message":"order received","meta":{"orderId":"6e2fd9a9-0fe3-4885-a981-8aaa32c22e30","email":"assouljawad97@gmail.com"}}
+{"ts":"2026-04-25T23:06:10.728Z","level":"INFO","message":"order received","meta":{"orderId":"0c1a5d18-82ab-4380-b150-93912e33627d","email":"assouljawad97@gmail.com"}}

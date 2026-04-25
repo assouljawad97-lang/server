@@ -10,12 +10,18 @@
 <body>
   <main class="admin-shell" id="adminShell">
     <aside class="admin-sidebar d-none" id="adminSidebar">
-      <a href="/" class="brand mb-4">
-        <span class="brand-mark">O</span>
+      <a href="#" class="brand mb-4">
+        <span>
+          <img src="/logo.png" alt="Officino" width="50px" height="50px"  />
+        </span>
         <span>Officino</span>
       </a>
       <button class="nav-pill active" data-page="licenses" type="button">License Management</button>
-      <button class="nav-pill" data-page="activations" type="button">Activation</button>
+      <button class="nav-pill d-flex align-items-center justify-content-between" data-page="orders" type="button">
+        <span>Orders</span>
+        <span id="newOrdersSidebarBadge" class="badge text-bg-danger d-none">0</span>
+      </button>
+      <button class="nav-pill" data-page="activations" type="button">Activations</button>
       <button class="nav-pill" data-page="devices" type="button">Devices</button>
       <button class="nav-pill" data-page="logs" type="button">Logs</button>
       <button class="btn btn-outline-dark" id="adminLogoutBtn" type="button">Logout</button>
@@ -147,6 +153,33 @@
         </section>
       </section>
 
+      <section class="d-none" id="adminOrdersCard">
+        <section class="card shadow-sm main-list-card">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h2 class="h5 mb-0">Orders</h2>
+            <button class="btn btn-outline-secondary" id="refreshOrdersBtn" type="button">Refresh</button>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 admin-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Responses</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+
       <section class="d-none" id="adminLogsCard">
         <section class="card shadow-sm main-list-card">
           <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
@@ -251,6 +284,46 @@
         <div class="modal-footer">
           <button class="btn btn-success" id="activateLicenseBtn" type="button">Activate Key</button>
           <button class="btn btn-danger" id="deactivateLicenseBtn" type="button">Deactivate Key</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="orderResponseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Respond to Order</h5>
+          <button type="button" class="btn-close" id="closeOrderResponseModalBtn" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="order-summary mb-3">
+            <div><strong>Customer:</strong> <span id="orderModalCustomer">-</span></div>
+            <div><strong>Email:</strong> <span id="orderModalEmail">-</span></div>
+            <div><strong>Phone:</strong> <span id="orderModalPhone">-</span></div>
+          </div>
+          <form id="orderResponseForm" class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Subject</label>
+              <input id="orderResponseSubject" class="form-control" placeholder="Activation details for your order" required />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Activation Key</label>
+              <input id="orderResponseKey" class="form-control" placeholder="XXXX-XXXX-XXXX-XXXX" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Message</label>
+              <textarea id="orderResponseMessage" class="form-control" rows="6" placeholder="Write your response..." required></textarea>
+            </div>
+            <div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
+              <button class="btn btn-primary" id="orderSaveResponseBtn" type="submit">Send Email</button>
+            </div>
+          </form>
+          <div class="mt-3">
+            <h6 class="mb-2">Response History</h6>
+            <div id="orderResponseHistory" class="small text-muted">No responses yet.</div>
+          </div>
+          <div id="orderResponseResult" class="small mt-2"></div>
         </div>
       </div>
     </div>

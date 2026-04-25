@@ -1,8 +1,10 @@
 const STORAGE_KEY = 'officino_admin_token';
 
 let currentLicense = null;
+let currentOrder = null;
 let managerModal = null;
 let licenseModal = null;
+let orderResponseModal = null;
 let currentPage = 'licenses';
 
 function getAdminToken() {
@@ -40,10 +42,20 @@ function shortFingerprint(value) {
   return `${text.slice(0, 8)}...${text.slice(-8)}`;
 }
 
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function setAuthenticatedUi(isAuth) {
   document.getElementById('adminAuthCard')?.classList.toggle('d-none', isAuth);
   document.getElementById('adminListCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'licenses');
   document.getElementById('adminActivationsCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'activations');
+  document.getElementById('adminOrdersCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'orders');
   document.getElementById('adminDevicesCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'devices');
   document.getElementById('adminLogsCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'logs');
   document.getElementById('adminSidebar')?.classList.toggle('d-none', !isAuth);
@@ -52,8 +64,39 @@ function setAuthenticatedUi(isAuth) {
 
 function statusBadge(status) {
   const normalized = String(status || '').toUpperCase();
-  const cls = normalized === 'ACTIVE' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger';
+  let cls = 'bg-secondary-subtle text-secondary';
+  if (normalized === 'ACTIVE' || normalized === 'RESPONDED' || normalized === 'SENT') {
+    cls = 'bg-success-subtle text-success';
+  } else if (normalized === 'NEW') {
+    cls = 'bg-warning-subtle text-warning-emphasis';
+  } else if (normalized === 'DEACTIVATED' || normalized === 'FAILED' || normalized === 'ERROR') {
+    cls = 'bg-danger-subtle text-danger';
+  }
   return `<span class="badge ${cls}">${normalized || '-'}</span>`;
+}
+
+function setNewOrdersSidebarBadge(count) {
+  const badge = document.getElementById('newOrdersSidebarBadge');
+  if (!badge) return;
+  const safeCount = Number(count) || 0;
+  if (safeCount > 0) {
+    badge.classList.remove('d-none');
+    badge.textContent = String(safeCount);
+  } else {
+    badge.classList.add('d-none');
+    badge.textContent = '0';
+  }
+}
+
+async function refreshNewOrdersBadge() {
+  try {
+    const data = await fetchJson('/api/admin/orders', { headers: authHeaders() });
+    const rows = Array.isArray(data.orders) ? data.orders : [];
+    const newCount = rows.filter((item) => String(item.status || '').toUpperCase() === 'NEW').length;
+    setNewOrdersSidebarBadge(newCount);
+  } catch (error) {
+    setNewOrdersSidebarBadge(0);
+  }
 }
 
 function updateStats(rows) {
@@ -98,8 +141,8 @@ async function loadLicenses() {
   updateStats(rows);
   body.innerHTML = rows.map((item) => `
     <tr>
-      <td>${item.customerName || '-'}</td>
-      <td>${item.keyLast4 || '-'}</td>
+      <td>${escapeHtml(item.customerName || '-')}</td>
+      <td>${escapeHtml(item.keyLast4 || '-')}</td>
       <td>${statusBadge(item.status)}</td>
       <td>${item.activationsCount || 0}</td>
       <td>${item.maxDevices || 1}</td>
@@ -142,8 +185,8 @@ async function loadActivations() {
       .join('<br/>') || '-';
     return `
       <tr>
-        <td>${item.customerName || '-'}</td>
-        <td>${item.keyLast4 || '-'}</td>
+        <td>${escapeHtml(item.customerName || '-')}</td>
+        <td>${escapeHtml(item.keyLast4 || '-')}</td>
         <td>${statusBadge(item.status)}</td>
         <td>${item.devicesBound || 0} / ${item.maxDevices || 1}</td>
         <td>${hardwareList}</td>
@@ -165,16 +208,93 @@ async function loadDevices() {
   }
   body.innerHTML = rows.map((item) => `
     <tr>
-      <td>${item.customerName || '-'}</td>
-      <td>${item.keyLast4 || '-'}</td>
-      <td>${item.deviceName || '-'}</td>
-      <td title="${item.hardwareFingerprint || '-'}">${shortFingerprint(item.hardwareFingerprint)}</td>
-      <td>${item.firstSeenIp || '-'}</td>
-      <td>${item.lastSeenIp || '-'}</td>
+      <td>${escapeHtml(item.customerName || '-')}</td>
+      <td>${escapeHtml(item.keyLast4 || '-')}</td>
+      <td>${escapeHtml(item.deviceName || '-')}</td>
+      <td title="${escapeHtml(item.hardwareFingerprint || '-')}">${escapeHtml(shortFingerprint(item.hardwareFingerprint))}</td>
+      <td>${escapeHtml(item.firstSeenIp || '-')}</td>
+      <td>${escapeHtml(item.lastSeenIp || '-')}</td>
       <td>${fmtDate(item.activatedAt)}</td>
       <td>${fmtDate(item.lastSeenAt)}</td>
     </tr>
   `).join('');
+}
+
+async function loadOrders() {
+  const body = document.getElementById('ordersTableBody');
+  if (!body) return;
+  body.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+  const data = await fetchJson('/api/admin/orders', { headers: authHeaders() });
+  const rows = Array.isArray(data.orders) ? data.orders : [];
+  const newCount = rows.filter((item) => String(item.status || '').toUpperCase() === 'NEW').length;
+  setNewOrdersSidebarBadge(newCount);
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="7">No orders yet.</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map((item) => `
+    <tr>
+      <td>${escapeHtml(item.fullName || `${item.firstName || ''} ${item.lastName || ''}`.trim() || '-')}</td>
+      <td>${escapeHtml(item.email || '-')}</td>
+      <td>${escapeHtml(item.phone || '-')}</td>
+      <td>${statusBadge(item.status)}</td>
+      <td>${fmtDate(item.createdAt)}</td>
+      <td>${Array.isArray(item.responses) ? item.responses.length : 0}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary" data-action="respond-order" data-id="${escapeHtml(item.id)}">Respond</button>
+      </td>
+    </tr>
+  `).join('');
+  body.querySelectorAll('[data-action="respond-order"]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const order = rows.find((row) => String(row.id) === String(btn.dataset.id));
+      if (!order) return;
+      openOrderResponseModal(order);
+    });
+  });
+}
+
+function openOrderResponseModal(order) {
+  currentOrder = order;
+  const customer = document.getElementById('orderModalCustomer');
+  const email = document.getElementById('orderModalEmail');
+  const phone = document.getElementById('orderModalPhone');
+  const subject = document.getElementById('orderResponseSubject');
+  const activationKey = document.getElementById('orderResponseKey');
+  const message = document.getElementById('orderResponseMessage');
+  const result = document.getElementById('orderResponseResult');
+  const history = document.getElementById('orderResponseHistory');
+
+  if (customer) customer.textContent = order.fullName || `${order.firstName || ''} ${order.lastName || ''}`.trim() || '-';
+  if (email) email.textContent = order.email || '-';
+  if (phone) phone.textContent = order.phone || '-';
+  if (subject) subject.value = `Your Officino Activation Key`;
+  if (activationKey) activationKey.value = '';
+  if (message) {
+    message.value = `Hello ${order.firstName || order.fullName || ''},\n\nThank you for your order.\n\nPlease contact support if you need setup help.\n\nBest regards,\nOfficino Support`;
+  }
+  if (result) {
+    result.className = 'small mt-2';
+    result.textContent = '';
+  }
+  if (history) {
+    const responses = Array.isArray(order.responses) ? order.responses : [];
+    if (!responses.length) {
+      history.textContent = 'No responses yet.';
+    } else {
+      history.innerHTML = responses.map((entry) => `
+        <div class="history-item">
+          <div><strong>${escapeHtml(entry.subject || '-')}</strong></div>
+          <div>${escapeHtml(fmtDate(entry.createdAt))} · ${escapeHtml(entry.adminUser || 'admin')}</div>
+          <div><strong>Email:</strong> ${escapeHtml(entry.emailStatus || 'PENDING')}</div>
+          <div>${escapeHtml(entry.activationKey || '-')}</div>
+          ${entry.emailError ? `<div class="text-danger">${escapeHtml(entry.emailError)}</div>` : ''}
+          <div>${escapeHtml(entry.message || '-')}</div>
+        </div>
+      `).join('');
+    }
+  }
+  orderResponseModal.show();
 }
 
 async function loadLogs() {
@@ -198,9 +318,9 @@ async function loadLogs() {
   body.innerHTML = rows.map((row) => `
     <tr>
       <td>${fmtDate(row.ts)}</td>
-      <td>${row.level || '-'}</td>
-      <td>${row.message || '-'}</td>
-      <td><pre class="mb-0 small">${row.meta ? JSON.stringify(row.meta, null, 2) : '-'}</pre></td>
+      <td>${escapeHtml(row.level || '-')}</td>
+      <td>${escapeHtml(row.message || '-')}</td>
+      <td><pre class="mb-0 small">${escapeHtml(row.meta ? JSON.stringify(row.meta, null, 2) : '-')}</pre></td>
     </tr>
   `).join('');
 }
@@ -258,6 +378,7 @@ async function unbindDevice(deviceId) {
 async function loadCurrentPage() {
   if (currentPage === 'licenses') return loadLicenses();
   if (currentPage === 'activations') return loadActivations();
+  if (currentPage === 'orders') return loadOrders();
   if (currentPage === 'devices') return loadDevices();
   if (currentPage === 'logs') return loadLogs();
   return loadLicenses();
@@ -274,6 +395,7 @@ function setCurrentPage(page) {
 
 async function openAdminPanel() {
   setAuthenticatedUi(true);
+  refreshNewOrdersBadge();
   setCurrentPage(currentPage || 'licenses');
 }
 
@@ -327,6 +449,7 @@ function bindToolbar() {
   });
   document.getElementById('refreshLicensesBtn')?.addEventListener('click', () => loadLicenses().catch((error) => alert(String(error.message || error))));
   document.getElementById('refreshActivationsBtn')?.addEventListener('click', () => loadActivations().catch((error) => alert(String(error.message || error))));
+  document.getElementById('refreshOrdersBtn')?.addEventListener('click', () => loadOrders().catch((error) => alert(String(error.message || error))));
   document.getElementById('refreshDevicesBtn')?.addEventListener('click', () => loadDevices().catch((error) => alert(String(error.message || error))));
   document.getElementById('refreshLogsBtn')?.addEventListener('click', () => loadLogs().catch((error) => alert(String(error.message || error))));
   document.getElementById('logLevelFilter')?.addEventListener('change', () => loadLogs().catch((error) => alert(String(error.message || error))));
@@ -411,11 +534,59 @@ function bindLicenseActions() {
   });
 }
 
+function bindOrderActions() {
+  const responseForm = document.getElementById('orderResponseForm');
+  const result = document.getElementById('orderResponseResult');
+  if (!responseForm || !result) return;
+  responseForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!currentOrder?.id) return;
+    const subject = document.getElementById('orderResponseSubject')?.value?.trim() || '';
+    const message = document.getElementById('orderResponseMessage')?.value?.trim() || '';
+    const activationKey = document.getElementById('orderResponseKey')?.value?.trim() || '';
+    if (!subject || !message) {
+      result.className = 'small mt-2 text-danger';
+      result.textContent = 'Subject and message are required.';
+      return;
+    }
+    const saveBtn = document.getElementById('orderSaveResponseBtn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Sending...';
+    }
+    try {
+      const payload = await fetchJson(`/api/admin/orders/${encodeURIComponent(currentOrder.id)}/respond`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ subject, message, activationKey })
+      });
+      if (String(payload.emailStatus || '').toUpperCase() === 'SENT') {
+        result.className = 'small mt-2 text-success';
+        result.textContent = 'Response saved and email sent successfully.';
+      } else {
+        result.className = 'small mt-2 text-warning';
+        result.textContent = `Response saved, but email was not sent: ${payload.emailError || 'SMTP error.'}`;
+      }
+      await loadOrders();
+    } catch (error) {
+      result.className = 'small mt-2 text-danger';
+      result.textContent = String(error.message || error);
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Send Email';
+      }
+    }
+  });
+}
+
 function initModals() {
   managerModal = new bootstrap.Modal(document.getElementById('managerModal'));
   licenseModal = new bootstrap.Modal(document.getElementById('licenseModal'));
+  orderResponseModal = new bootstrap.Modal(document.getElementById('orderResponseModal'));
   document.getElementById('closeManagerModalBtn')?.addEventListener('click', () => managerModal.hide());
   document.getElementById('closeLicenseModalBtn')?.addEventListener('click', () => licenseModal.hide());
+  document.getElementById('closeOrderResponseModalBtn')?.addEventListener('click', () => orderResponseModal.hide());
 }
 
 async function resumeSession() {
@@ -439,9 +610,9 @@ function init() {
   bindSidebarNav();
   bindCreateForm();
   bindLicenseActions();
+  bindOrderActions();
   setAuthenticatedUi(false);
   resumeSession();
 }
 
 init();
-

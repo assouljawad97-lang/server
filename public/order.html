@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Officino</title>
+  <link rel="stylesheet" href="/bootstrap.min.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container-xl d-flex align-items-center justify-content-between py-3">
+      <a href="/" class="brand">
+        <span>
+          <img src="/logo.png" alt="Officino" width="50" height="50" />
+        </span>
+        <span class="brand-text">Officino</span>
+      </a>
+      <div class="d-flex gap-2 align-items-center header-actions">
+        <select id="langSelect" class="form-select form-select-sm lang-select" aria-label="Language">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="ar">Arabic</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="order-page-wrap">
+    <section class="container-xl py-5">
+      <div class="order-card mx-auto">
+        <div class="section-head text-center mb-4">
+          <h1 class="mb-2" data-i18n="order.title">Order Officino</h1>
+          <p data-i18n="order.subtitle">Fill your details and we will contact you with activation info.</p>
+        </div>
+
+        <div id="orderSuccessBanner" class="alert alert-success border-0 shadow-sm mb-4 p-3 fs-5 fw-semibold d-none" role="alert"></div>
+
+        <form id="orderForm" class="row g-3" autocomplete="off">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="orderFirstName" data-i18n="order.firstName">First Name</label>
+            <input id="orderFirstName" class="form-control form-control-lg" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="orderLastName" data-i18n="order.lastName">Last Name</label>
+            <input id="orderLastName" class="form-control form-control-lg" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="orderEmail" data-i18n="order.email">Email</label>
+            <input id="orderEmail" type="email" class="form-control form-control-lg" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="orderPhone" data-i18n="order.phone">Phone Number</label>
+            <input id="orderPhone" class="form-control form-control-lg" required />
+          </div>
+          <div class="d-none">
+            <label for="website">Website</label>
+            <input id="website" name="website" />
+          </div>
+          <div class="col-12 d-grid d-md-flex justify-content-md-end">
+            <button id="orderSubmitBtn" class="btn btn-primary btn-lg px-4" type="submit" data-i18n="order.submit">Submit Order</button>
+          </div>
+        </form>
+
+        <div id="orderResult" class="small mt-3 text-muted"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container-xl d-flex flex-column flex-lg-row justify-content-between gap-2 py-3">
+      <span>© <span id="yearNow"></span> Officino. <span data-i18n="footer.rights">All rights reserved.</span></span>
+      <div class="d-flex gap-3">
+        <span data-i18n="footer.privacy">Privacy Policy</span>
+        <span data-i18n="footer.terms">Terms and Conditions</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -7,9 +7,8 @@ const I18N = {
     'nav.howItWorks': 'How It Works',
     'nav.support': 'Support',
     'buttons.windows': 'Windows',
-    'buttons.mac': 'macOS',
     'buttons.downloadWindows': 'Download for Windows',
-    'buttons.downloadMac': 'Download for macOS',
+    'buttons.downloadOrder': 'Order Your Copy',
     'hero.kicker': 'Office workflow made simple',
     'hero.title': 'Administrative desktop software for fast, secure daily work.',
     'hero.text': 'Manage clients, applications, scans, documents, and activation from one clean platform designed for real offices.',
@@ -29,8 +28,6 @@ const I18N = {
     'features.f3Text': 'Merge, compress, crop, split, and convert with simple tools.',
     'features.f4Title': 'LAN Collaboration',
     'features.f4Text': 'Run host/guest mode so your team works from one shared source.',
-    'features.f5Title': 'Activation Security',
-    'features.f5Text': 'License key checks with admin control for activate/deactivate.',
     'features.f6Title': 'Built for Real Offices',
     'features.f6Text': 'Fast interface, clear steps, and multilingual support.',
     'how.title': 'How it Works',
@@ -42,7 +39,7 @@ const I18N = {
     'how.s3Title': 'Start Working',
     'how.s3Text': 'Manage clients, scan files, and keep operations organized.',
     'contact.title': "Let's Stay Connected",
-    'contact.subtitle': 'Need setup help or activation support? We’re ready to assist.',
+    'contact.subtitle': 'Need setup help or activation support? We are ready to assist.',
     'contact.whatsappTitle': 'WhatsApp Support',
     'contact.whatsappText': 'Fast reply for setup and activation questions.',
     'contact.whatsappAction': 'Chat on WhatsApp',
@@ -52,20 +49,28 @@ const I18N = {
     'contact.note': 'Support contact: +34 642 190 408 · assouljawad823@gmail.com',
     'footer.rights': 'All rights reserved.',
     'footer.privacy': 'Privacy Policy',
-    'footer.terms': 'Terms and Conditions'
+    'footer.terms': 'Terms and Conditions',
+    'order.title': 'Order Officino',
+    'order.subtitle': 'Fill your details and we will contact you with activation info.',
+    'order.firstName': 'First Name',
+    'order.lastName': 'Last Name',
+    'order.email': 'Email',
+    'order.phone': 'Phone Number',
+    'order.submit': 'Submit Order',
+    'order.success': 'Order received successfully. We will contact you soon.',
+    'order.error': 'Could not submit your order. Please try again.'
   },
   es: {
     'nav.features': 'Funciones',
-    'nav.howItWorks': 'Cómo Funciona',
+    'nav.howItWorks': 'Cómo funciona',
     'nav.support': 'Soporte',
     'buttons.windows': 'Windows',
-    'buttons.mac': 'macOS',
     'buttons.downloadWindows': 'Descargar para Windows',
-    'buttons.downloadMac': 'Descargar para macOS',
+    'buttons.downloadOrder': 'Solicitar tu copia',
     'hero.kicker': 'Flujo de oficina simplificado',
     'hero.title': 'Software de escritorio administrativo para trabajo diario rápido y seguro.',
     'hero.text': 'Gestiona clientes, solicitudes, escaneos, documentos y activación desde una plataforma limpia para oficinas reales.',
-    'heroCard.title': 'Qué Obtienes',
+    'heroCard.title': 'Qué obtienes',
     'heroCard.li1': 'Aplicación de escritorio offline-first',
     'heroCard.li2': 'Compatibilidad de escáner (WIA/TWAIN + red)',
     'heroCard.li3': 'Herramientas PDF e historial del cliente',
@@ -73,47 +78,53 @@ const I18N = {
     'heroCard.li5': 'Activación y validación de licencias',
     'features.title': 'Funciones increíbles para facilitar tu trabajo',
     'features.subtitle': 'Todo lo que tu oficina necesita para procesar archivos con rapidez y precisión.',
-    'features.f1Title': 'Gestión de Clientes',
+    'features.f1Title': 'Gestión de clientes',
     'features.f1Text': 'Sigue cada cliente con historial completo de solicitudes y estados.',
-    'features.f2Title': 'Flujo de Documentos Inteligente',
+    'features.f2Title': 'Flujo de documentos inteligente',
     'features.f2Text': 'Importa, previsualiza, escanea y gestiona archivos en un solo lugar.',
     'features.f3Title': 'Productividad PDF',
     'features.f3Text': 'Une, comprime, recorta, divide y convierte con herramientas simples.',
     'features.f4Title': 'Colaboración en LAN',
     'features.f4Text': 'Usa modo host/invitado para que el equipo trabaje con una sola fuente.',
-    'features.f5Title': 'Seguridad de Activación',
-    'features.f5Text': 'Verificación de licencias con control de activar/desactivar desde admin.',
-    'features.f6Title': 'Hecho para Oficinas Reales',
+    'features.f6Title': 'Hecho para oficinas reales',
     'features.f6Text': 'Interfaz rápida, pasos claros y soporte multilingüe.',
-    'how.title': 'Cómo Funciona',
+    'how.title': 'Cómo funciona',
     'how.subtitle': 'Flujo simple para tu equipo desde la instalación hasta el trabajo diario.',
-    'how.s1Title': 'Instala la App',
+    'how.s1Title': 'Instala la app',
     'how.s1Text': 'Descarga e instala en los ordenadores de tu oficina.',
-    'how.s2Title': 'Configura y Activa',
+    'how.s2Title': 'Configura y activa',
     'how.s2Text': 'Elige modo, configura carpetas y activa tu licencia.',
-    'how.s3Title': 'Empieza a Trabajar',
+    'how.s3Title': 'Empieza a trabajar',
     'how.s3Text': 'Gestiona clientes, escanea archivos y mantén todo organizado.',
-    'contact.title': 'Sigamos Conectados',
+    'contact.title': 'Sigamos conectados',
     'contact.subtitle': '¿Necesitas ayuda con la configuración o activación? Estamos listos para ayudarte.',
     'contact.whatsappTitle': 'Soporte por WhatsApp',
     'contact.whatsappText': 'Respuesta rápida para dudas de configuración y activación.',
     'contact.whatsappAction': 'Abrir WhatsApp',
-    'contact.emailTitle': 'Soporte por Email',
+    'contact.emailTitle': 'Soporte por email',
     'contact.emailText': 'Envía capturas o incidencias detalladas por correo.',
-    'contact.emailAction': 'Enviar Email',
+    'contact.emailAction': 'Enviar email',
     'contact.note': 'Contacto de soporte: +34 642 190 408 · assouljawad823@gmail.com',
     'footer.rights': 'Todos los derechos reservados.',
-    'footer.privacy': 'Política de Privacidad',
-    'footer.terms': 'Términos y Condiciones'
+    'footer.privacy': 'Política de privacidad',
+    'footer.terms': 'Términos y condiciones',
+    'order.title': 'Solicitar Officino',
+    'order.subtitle': 'Completa tus datos y te contactaremos con la información de activación.',
+    'order.firstName': 'Nombre',
+    'order.lastName': 'Apellidos',
+    'order.email': 'Correo electrónico',
+    'order.phone': 'Número de teléfono',
+    'order.submit': 'Enviar solicitud',
+    'order.success': 'Solicitud recibida correctamente. Te contactaremos pronto.',
+    'order.error': 'No se pudo enviar la solicitud. Inténtalo de nuevo.'
   },
   ar: {
     'nav.features': 'المميزات',
     'nav.howItWorks': 'طريقة العمل',
     'nav.support': 'الدعم',
     'buttons.windows': 'ويندوز',
-    'buttons.mac': 'ماك',
     'buttons.downloadWindows': 'تحميل لويندوز',
-    'buttons.downloadMac': 'تحميل لماك',
+    'buttons.downloadOrder': 'اطلب نسختك',
     'hero.kicker': 'تنظيم العمل المكتبي بشكل أسهل',
     'hero.title': 'برنامج مكتبي إداري للعمل اليومي بسرعة وأمان.',
     'hero.text': 'إدارة العملاء والطلبات والمسح الضوئي والملفات والتفعيل من منصة واحدة واضحة ومناسبة للمكاتب.',
@@ -133,8 +144,6 @@ const I18N = {
     'features.f3Text': 'دمج وضغط وقص وتقسيم وتحويل بسهولة.',
     'features.f4Title': 'العمل عبر الشبكة',
     'features.f4Text': 'وضع المضيف والضيف ليعمل الفريق على مصدر واحد.',
-    'features.f5Title': 'أمان التفعيل',
-    'features.f5Text': 'التحكم في التفعيل والتعطيل من لوحة الإدارة.',
     'features.f6Title': 'مصمم للمكاتب الحقيقية',
     'features.f6Text': 'واجهة سريعة وخطوات واضحة ودعم متعدد اللغات.',
     'how.title': 'كيف يعمل',
@@ -142,11 +151,11 @@ const I18N = {
     'how.s1Title': 'ثبّت التطبيق',
     'how.s1Text': 'قم بالتحميل والتثبيت على أجهزة المكتب.',
     'how.s2Title': 'الإعداد والتفعيل',
-    'how.s2Text': 'اختر الوضع، وحدد المسارات، ثم فعّل المفتاح.',
+    'how.s2Text': 'اختر الوضع وحدد المسارات ثم فعّل المفتاح.',
     'how.s3Title': 'ابدأ العمل',
     'how.s3Text': 'أدر العملاء وامسح الملفات ونظّم العمل اليومي.',
-    'contact.title': 'لنحافظ على التواصل',
-    'contact.subtitle': 'إذا احتجت دعمًا في الإعداد أو التفعيل فنحن جاهزون للمساعدة.',
+    'contact.title': 'لنبقَ على تواصل',
+    'contact.subtitle': 'إذا احتجت دعماً في الإعداد أو التفعيل فنحن جاهزون للمساعدة.',
     'contact.whatsappTitle': 'دعم واتساب',
     'contact.whatsappText': 'رد سريع لأسئلة الإعداد والتفعيل.',
     'contact.whatsappAction': 'محادثة عبر واتساب',
@@ -156,7 +165,16 @@ const I18N = {
     'contact.note': 'الدعم: +34 642 190 408 · assouljawad823@gmail.com',
     'footer.rights': 'جميع الحقوق محفوظة.',
     'footer.privacy': 'سياسة الخصوصية',
-    'footer.terms': 'الشروط والأحكام'
+    'footer.terms': 'الشروط والأحكام',
+    'order.title': 'طلب Officino',
+    'order.subtitle': 'املأ بياناتك وسنتواصل معك بمعلومات التفعيل.',
+    'order.firstName': 'الاسم الأول',
+    'order.lastName': 'الاسم الأخير',
+    'order.email': 'البريد الإلكتروني',
+    'order.phone': 'رقم الهاتف',
+    'order.submit': 'إرسال الطلب',
+    'order.success': 'تم استلام الطلب بنجاح. سنتواصل معك قريباً.',
+    'order.error': 'تعذر إرسال الطلب. حاول مرة أخرى.'
   }
 };
 
@@ -181,18 +199,15 @@ function applyLanguage(lang) {
 }
 
 async function loadMeta() {
+  const windows = document.getElementById('downloadWindows');
+  const windowsHero = document.getElementById('downloadWindowsHero');
+  if (!windows && !windowsHero) return;
   try {
     const response = await fetch('/api/meta');
     const data = await response.json();
     if (!data || !data.ok) return;
-    const windows = document.getElementById('downloadWindows');
-    const mac = document.getElementById('downloadMac');
-    const windowsHero = document.getElementById('downloadWindowsHero');
-    const macHero = document.getElementById('downloadMacHero');
     if (windows) windows.href = data.downloads.windows || '#';
-    if (mac) mac.href = data.downloads.mac || '#';
     if (windowsHero) windowsHero.href = data.downloads.windows || '#';
-    if (macHero) macHero.href = data.downloads.mac || '#';
   } catch (error) {
     // ignore
   }
@@ -201,8 +216,60 @@ async function loadMeta() {
 function bindLanguageSelect() {
   const select = document.getElementById('langSelect');
   if (!select) return;
-  select.addEventListener('change', () => {
-    applyLanguage(select.value);
+  select.addEventListener('change', () => applyLanguage(select.value));
+}
+
+function bindOrderForm() {
+  const form = document.getElementById('orderForm');
+  if (!form) return;
+  const result = document.getElementById('orderResult');
+  const successBanner = document.getElementById('orderSuccessBanner');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const payload = {
+      firstName: String(document.getElementById('orderFirstName')?.value || '').trim(),
+      lastName: String(document.getElementById('orderLastName')?.value || '').trim(),
+      email: String(document.getElementById('orderEmail')?.value || '').trim(),
+      phone: String(document.getElementById('orderPhone')?.value || '').trim(),
+      website: String(document.getElementById('website')?.value || '').trim()
+    };
+    const submitBtn = document.getElementById('orderSubmitBtn');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+    }
+    if (result) {
+      result.className = 'small mt-3 text-muted';
+      result.textContent = '';
+    }
+    if (successBanner) {
+      successBanner.classList.add('d-none');
+      successBanner.textContent = '';
+    }
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) {
+        throw new Error((data && data.message) || I18N.en['order.error']);
+      }
+      form.reset();
+      if (successBanner) {
+        successBanner.classList.remove('d-none');
+        successBanner.textContent = I18N[resolveLanguage()]['order.success'] || I18N.en['order.success'];
+      }
+    } catch (error) {
+      if (result) {
+        result.className = 'small mt-3 text-danger';
+        result.textContent = String(error.message || I18N.en['order.error']);
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+      }
+    }
   });
 }
 
@@ -212,3 +279,4 @@ if (yearNode) yearNode.textContent = String(new Date().getFullYear());
 bindLanguageSelect();
 applyLanguage(resolveLanguage());
 loadMeta();
+bindOrderForm();
