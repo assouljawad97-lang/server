@@ -14,10 +14,10 @@
         <span class="brand-mark">O</span>
         <span>Officino</span>
       </a>
-      <div class="nav-pill active">License Management</div>
-      <div class="nav-pill">Activation</div>
-      <div class="nav-pill">Devices</div>
-      <div class="nav-pill">Logs</div>
+      <button class="nav-pill active" data-page="licenses" type="button">License Management</button>
+      <button class="nav-pill" data-page="activations" type="button">Activation</button>
+      <button class="nav-pill" data-page="devices" type="button">Devices</button>
+      <button class="nav-pill" data-page="logs" type="button">Logs</button>
       <button class="btn btn-outline-dark" id="adminLogoutBtn" type="button">Logout</button>
       <div class="sidebar-foot">Admin Panel</div>
     </aside>
@@ -92,6 +92,93 @@
           </div>
         </section>
       </section>
+
+      <section class="d-none" id="adminActivationsCard">
+        <section class="card shadow-sm main-list-card">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h2 class="h5 mb-0">Activation Tracking</h2>
+            <button class="btn btn-outline-secondary" id="refreshActivationsBtn" type="button">Refresh</button>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 admin-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Key Last 4</th>
+                    <th>Status</th>
+                    <th>Devices Bound</th>
+                    <th>Hardware</th>
+                    <th>Last Seen</th>
+                  </tr>
+                </thead>
+                <tbody id="activationsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="d-none" id="adminDevicesCard">
+        <section class="card shadow-sm main-list-card">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h2 class="h5 mb-0">Devices History</h2>
+            <button class="btn btn-outline-secondary" id="refreshDevicesBtn" type="button">Refresh</button>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 admin-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Key Last 4</th>
+                    <th>Device</th>
+                    <th>Hardware</th>
+                    <th>First IP</th>
+                    <th>Last IP</th>
+                    <th>Activated</th>
+                    <th>Last Seen</th>
+                  </tr>
+                </thead>
+                <tbody id="devicesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="d-none" id="adminLogsCard">
+        <section class="card shadow-sm main-list-card">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h2 class="h5 mb-0">Server Logs</h2>
+            <div class="d-flex gap-2 align-items-center">
+              <select id="logLevelFilter" class="form-select form-select-sm">
+                <option value="">All</option>
+                <option value="ERROR">ERROR</option>
+                <option value="WARN">WARN</option>
+                <option value="INFO">INFO</option>
+              </select>
+              <button class="btn btn-outline-secondary btn-sm" id="refreshLogsBtn" type="button">Refresh</button>
+            </div>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="small text-muted mb-2" id="serverLogPath">-</div>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 admin-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Level</th>
+                    <th>Message</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody id="logsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
     </section>
   </main>
 
@@ -149,11 +236,12 @@
               <thead>
                 <tr>
                   <th>Computer Name</th>
-                  <th>Machine ID</th>
+                  <th>Device Fingerprint</th>
                   <th>First IP</th>
                   <th>Last IP</th>
                   <th>Activated At</th>
                   <th>Last Seen</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="deviceRows"></tbody>

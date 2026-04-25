@@ -6,19 +6,31 @@ const { authenticateAdmin, verifyAdminToken } = require('./admin-auth');
 const {
   createLicense,
   listLicenses,
+  listActivationOverview,
+  listDeviceHistory,
   getLicenseById,
   deactivateLicenseById,
   activateLicenseById,
   activateLicense,
   validateTokenAndTouch,
-  deactivateLicense
+  deactivateLicense,
+  unbindActivationById
 } = require('./license-service');
+const { logServerEvent, readServerLogs, getLogInfo } = require('./server-logger');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.resolve(process.cwd(), 'public')));
+
+process.on('uncaughtException', (error) => {
+  logServerEvent('ERROR', 'uncaughtException', error);
+});
+
+process.on('unhandledRejection', (reason) => {
+  logServerEvent('ERROR', 'unhandledRejection', reason);
+});
 
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -128,9 +140,9 @@ app.get('/api/admin/session', requireAdmin, async (req, res) => {
 // ✅ FIXED
 app.post('/api/activation/activate', async (req, res) => {
   try {
-    const { activationKey, machineId, deviceName } = req.body || {};
+    const { activationKey, hardwareFingerprint, deviceName } = req.body || {};
     const ipAddress = parseIpAddress(req);
-    const result = await activateLicense({ activationKey, machineId, deviceName, ipAddress });
+    const result = await activateLicense({ activationKey, hardwareFingerprint, deviceName, ipAddress });
     return res.json({ ok: true, ...result });
   } catch (error) {
     return res.status(400).json({ ok: false, message: error.message });
@@ -140,9 +152,9 @@ app.post('/api/activation/activate', async (req, res) => {
 // ✅ FIXED
 app.post('/api/activation/validate', async (req, res) => {
   try {
-    const { token, machineId } = req.body || {};
+    const { token, hardwareFingerprint } = req.body || {};
     const ipAddress = parseIpAddress(req);
-    const result = await validateTokenAndTouch({ token, machineId, ipAddress });
+    const result = await validateTokenAndTouch({ token, hardwareFingerprint, ipAddress });
     return res.json({ ok: true, ...result });
   } catch (error) {
     return res.status(400).json({ ok: false, message: error.message });
@@ -152,8 +164,8 @@ app.post('/api/activation/validate', async (req, res) => {
 // ✅ FIXED
 app.post('/api/activation/deactivate', async (req, res) => {
   try {
-    const { activationKey, machineId } = req.body || {};
-    const result = await deactivateLicense({ activationKey, machineId });
+    const { activationKey, hardwareFingerprint } = req.body || {};
+    const result = await deactivateLicense({ activationKey, hardwareFingerprint });
     return res.json({ ok: true, ...result });
   } catch (error) {
     return res.status(400).json({ ok: false, message: error.message });
@@ -161,8 +173,13 @@ app.post('/api/activation/deactivate', async (req, res) => {
 });
 
 app.get('/api/admin/licenses', requireAdmin, async (req, res) => {
-  const licenses = await listLicenses();
-  res.json({ ok: true, licenses });
+  try {
+    const licenses = await listLicenses();
+    res.json({ ok: true, licenses });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin licenses list failed', error);
+    res.status(500).json({ ok: false, message: 'Failed to load licenses.' });
+  }
 });
 
 app.post('/api/admin/licenses', requireAdmin, async (req, res) => {
@@ -183,6 +200,7 @@ app.post('/api/admin/licenses', requireAdmin, async (req, res) => {
       activationKey: result.activationKey
     });
   } catch (error) {
+    logServerEvent('ERROR', 'admin create license failed', error);
     res.status(400).json({ ok: false, message: error.message });
   }
 });
@@ -193,6 +211,7 @@ app.get('/api/admin/licenses/:id', requireAdmin, async (req, res) => {
     const license = await getLicenseById(String(req.params.id || '').trim());
     res.json({ ok: true, license });
   } catch (error) {
+    logServerEvent('ERROR', 'admin get license details failed', error);
     res.status(404).json({ ok: false, message: error.message });
   }
 });
@@ -203,6 +222,7 @@ app.post('/api/admin/licenses/:id/deactivate', requireAdmin, async (req, res) =>
     const result = await deactivateLicenseById(String(req.params.id || '').trim());
     res.json({ ok: true, ...result });
   } catch (error) {
+    logServerEvent('ERROR', 'admin deactivate license failed', error);
     res.status(400).json({ ok: false, message: error.message });
   }
 });
@@ -213,7 +233,53 @@ app.post('/api/admin/licenses/:id/activate', requireAdmin, async (req, res) => {
     const result = await activateLicenseById(String(req.params.id || '').trim());
     res.json({ ok: true, ...result });
   } catch (error) {
+    logServerEvent('ERROR', 'admin activate license failed', error);
     res.status(400).json({ ok: false, message: error.message });
+  }
+});
+
+app.post('/api/admin/licenses/:id/unbind', requireAdmin, async (req, res) => {
+  try {
+    const licenseId = String(req.params.id || '').trim();
+    const { hardwareFingerprint } = req.body || {};
+    const result = await unbindActivationById({ licenseId, hardwareFingerprint });
+    res.json({ ok: true, ...result });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin unbind device failed', error);
+    res.status(400).json({ ok: false, message: error.message });
+  }
+});
+
+app.get('/api/admin/activations', requireAdmin, async (req, res) => {
+  try {
+    const rows = await listActivationOverview();
+    res.json({ ok: true, activations: rows });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin activations list failed', error);
+    res.status(500).json({ ok: false, message: 'Failed to load activations.' });
+  }
+});
+
+app.get('/api/admin/devices', requireAdmin, async (req, res) => {
+  try {
+    const rows = await listDeviceHistory();
+    res.json({ ok: true, devices: rows });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin devices list failed', error);
+    res.status(500).json({ ok: false, message: 'Failed to load devices.' });
+  }
+});
+
+app.get('/api/admin/logs', requireAdmin, async (req, res) => {
+  try {
+    const level = String(req.query.level || '').trim();
+    const limit = Number(req.query.limit || 300);
+    const logs = readServerLogs({ level, limit });
+    const info = getLogInfo();
+    res.json({ ok: true, logs, logFilePath: info.logFilePath });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin logs list failed', error);
+    res.status(500).json({ ok: false, message: 'Failed to load logs.' });
   }
 });
 
@@ -222,6 +288,7 @@ app.get('*', (req, res) => {
 });
 
 app.listen(config.port, config.host, () => {
+  logServerEvent('INFO', `server started on http://${config.host}:${config.port}`);
   console.log(`[officino-server] listening on http://${config.host}:${config.port}`);
   console.log(`[officino-server] public base url: ${config.publicBaseUrl}`);
 });

@@ -47,6 +47,10 @@ body {
 }
 
 .nav-pill {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
   margin-bottom: 0.5rem;
   border-radius: 10px;
   padding: 0.6rem 0.75rem;

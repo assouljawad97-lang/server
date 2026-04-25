@@ -2,15 +2,6 @@ const { randomUUID, createHash } = require('crypto');
 const mongoose = require('mongoose');
 const { connectDB } = require('./db');
 
-const activationSchema = new mongoose.Schema({
-  machineId: String,
-  deviceName: String,
-  firstSeenIp: String,
-  lastSeenIp: String,
-  activatedAt: String,
-  lastSeenAt: String
-}, { _id: false });
-
 const licenseSchema = new mongoose.Schema({
   id: String,
   activationKey: String,
@@ -23,13 +14,24 @@ const licenseSchema = new mongoose.Schema({
   createdAt: String,
   deactivatedAt: String,
   activatedBackAt: String,
-  activations: [activationSchema]
+  activations: Array
 });
 
 const License = mongoose.models.License || mongoose.model('License', licenseSchema);
 
-async function initDB() {
+async function readDb() {
   await connectDB();
+  const licenses = await License.find().lean();
+  return { licenses };
+}
+
+async function writeDb(db) {
+  await connectDB();
+
+  await License.deleteMany({});
+  if (db.licenses?.length) {
+    await License.insertMany(db.licenses);
+  }
 }
 
 function hashActivationKey(key) {
@@ -44,8 +46,8 @@ function generateActivationKey() {
 }
 
 module.exports = {
-  License,
-  initDB,
+  readDb,
+  writeDb,
   hashActivationKey,
   generateActivationKey
 };

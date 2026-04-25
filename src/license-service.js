@@ -1,7 +1,7 @@
 const { randomUUID } = require('crypto');
 const {
-  License,
-  initDB,
+  readDb,
+  writeDb,
   hashActivationKey,
   generateActivationKey
 } = require('./storage');
@@ -11,17 +11,23 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-function normalizeMachineId(machineId) {
-  return String(machineId || '').trim();
+function isExpired(expiresAt) {
+  if (!expiresAt) return false;
+  const ms = new Date(expiresAt).getTime();
+  return Number.isFinite(ms) && Date.now() > ms;
+}
+
+function normalizeHardwareFingerprint(value) {
+  return String(value || '').trim();
 }
 
 async function createLicense({ customerName, maxDevices = 1, notes = '' }) {
-  await initDB();
+  const db = await readDb();
 
   const activationKey = generateActivationKey();
   const keyHash = hashActivationKey(activationKey);
 
-  const license = await License.create({
+  const license = {
     id: randomUUID(),
     activationKey,
     keyHash,
@@ -32,56 +38,102 @@ async function createLicense({ customerName, maxDevices = 1, notes = '' }) {
     notes: String(notes || ''),
     createdAt: nowIso(),
     activations: []
-  });
+  };
+
+  db.licenses.push(license);
+  await writeDb(db);
 
   return { license, activationKey };
 }
 
 async function listLicenses() {
-  await initDB();
-
-  const licenses = await License.find().lean();
-
-  return licenses.map((item) => ({
+  const db = await readDb();
+  return db.licenses.map((item) => ({
     id: item.id,
     customerName: item.customerName,
     keyLast4: item.keyLast4,
     status: item.status,
     maxDevices: item.maxDevices,
     createdAt: item.createdAt,
-    activationsCount: item.activations?.length || 0
+    activationsCount: Array.isArray(item.activations) ? item.activations.length : 0
   }));
 }
 
-async function getLicenseById(id) {
-  await initDB();
+async function listActivationOverview() {
+  const db = await readDb();
+  return db.licenses.map((license) => {
+    const activations = Array.isArray(license.activations) ? license.activations : [];
+    return {
+      id: license.id,
+      customerName: license.customerName || '',
+      activationKey: license.activationKey || '',
+      keyLast4: license.keyLast4 || '',
+      status: license.status || 'UNKNOWN',
+      maxDevices: Number(license.maxDevices) || 1,
+      devicesBound: activations.length,
+      activations: activations.map((a) => ({
+        hardwareFingerprint: a.hardwareFingerprint || '',
+        deviceName: a.deviceName || '',
+        activatedAt: a.activatedAt || '',
+        lastSeenAt: a.lastSeenAt || '',
+        firstSeenIp: a.firstSeenIp || '',
+        lastSeenIp: a.lastSeenIp || ''
+      }))
+    };
+  });
+}
 
-  const license = await License.findOne({ id }).lean();
+async function listDeviceHistory() {
+  const db = await readDb();
+  const rows = [];
+  (db.licenses || []).forEach((license) => {
+    const activations = Array.isArray(license.activations) ? license.activations : [];
+    activations.forEach((a) => {
+      rows.push({
+        licenseId: license.id,
+        customerName: license.customerName || '',
+        keyLast4: license.keyLast4 || '',
+        licenseStatus: license.status || 'UNKNOWN',
+        hardwareFingerprint: a.hardwareFingerprint || '',
+        deviceName: a.deviceName || '',
+        activatedAt: a.activatedAt || '',
+        lastSeenAt: a.lastSeenAt || '',
+        firstSeenIp: a.firstSeenIp || '',
+        lastSeenIp: a.lastSeenIp || ''
+      });
+    });
+  });
+  rows.sort((a, b) => String(b.lastSeenAt || b.activatedAt || '').localeCompare(String(a.lastSeenAt || a.activatedAt || '')));
+  return rows;
+}
+
+async function getLicenseById(id) {
+  const db = await readDb();
+  const license = db.licenses.find((item) => item.id === id);
   if (!license) throw new Error('License not found.');
 
   return {
     id: license.id,
     customerName: license.customerName,
-    activationKey: license.activationKey,
+    activationKey: license.activationKey || null,
     keyLast4: license.keyLast4,
     status: license.status,
     maxDevices: license.maxDevices,
     notes: license.notes || '',
     createdAt: license.createdAt,
-    activations: license.activations || []
+    activations: Array.isArray(license.activations) ? license.activations : []
   };
 }
 
 async function deactivateLicenseById(id) {
-  await initDB();
-
-  const license = await License.findOneAndUpdate(
-    { id },
-    { status: 'DEACTIVATED', deactivatedAt: nowIso() },
-    { new: true }
-  );
-
+  const db = await readDb();
+  const license = db.licenses.find((item) => item.id === id);
   if (!license) throw new Error('License not found.');
+
+  license.status = 'DEACTIVATED';
+  license.deactivatedAt = nowIso();
+
+  await writeDb(db);
 
   return {
     id: license.id,
@@ -91,60 +143,69 @@ async function deactivateLicenseById(id) {
 }
 
 async function activateLicenseById(id) {
-  await initDB();
-
-  const license = await License.findOneAndUpdate(
-    { id },
-    { status: 'ACTIVE', activatedBackAt: nowIso() },
-    { new: true }
-  );
-
+  const db = await readDb();
+  const license = db.licenses.find((item) => item.id === id);
   if (!license) throw new Error('License not found.');
 
+  license.status = 'ACTIVE';
+  delete license.deactivatedAt;
+  license.activatedBackAt = nowIso();
+
+  await writeDb(db);
   return {
     id: license.id,
-    status: license.status
+    status: license.status,
+    activatedBackAt: license.activatedBackAt
   };
 }
 
-async function activateLicense({ activationKey, machineId, deviceName, ipAddress }) {
-  await initDB();
-
-  const safeMachineId = normalizeMachineId(machineId);
-  if (!safeMachineId) throw new Error('machineId is required.');
-
+function findLicenseByKey(db, activationKey) {
   const keyHash = hashActivationKey(activationKey);
-  const license = await License.findOne({ keyHash });
+  return db.licenses.find((item) => item.keyHash === keyHash);
+}
 
-  if (!license) throw new Error('Invalid key.');
-  if (license.status !== 'ACTIVE') throw new Error('License inactive.');
+async function activateLicense({ activationKey, hardwareFingerprint, deviceName, ipAddress }) {
+  const safeFingerprint = normalizeHardwareFingerprint(hardwareFingerprint);
+  if (!safeFingerprint) throw new Error('hardwareFingerprint is required.');
 
-  const existing = license.activations.find(a => a.machineId === safeMachineId);
+  const db = await readDb();
+  const license = findLicenseByKey(db, activationKey);
 
-  if (!existing && license.activations.length >= license.maxDevices) {
-    throw new Error('Max devices reached.');
+  if (!license) throw new Error('Activation key is invalid.');
+  if (license.status !== 'ACTIVE') throw new Error('License is not active.');
+
+  const activations = Array.isArray(license.activations) ? license.activations : [];
+  const existing = activations.find(
+    (a) => String(a.hardwareFingerprint || '') === safeFingerprint
+  );
+
+  if (!existing && activations.length >= Math.max(1, Number(license.maxDevices) || 1)) {
+    throw new Error('Maximum devices reached.');
   }
 
   if (existing) {
     existing.lastSeenAt = nowIso();
-    existing.lastSeenIp = ipAddress;
+    existing.lastSeenIp = String(ipAddress || '');
+    existing.deviceName = String(deviceName || existing.deviceName || '');
+    existing.hardwareFingerprint = String(existing.hardwareFingerprint || safeFingerprint);
   } else {
-    license.activations.push({
-      machineId: safeMachineId,
-      deviceName,
-      firstSeenIp: ipAddress,
-      lastSeenIp: ipAddress,
+    activations.push({
+      hardwareFingerprint: safeFingerprint,
+      deviceName: String(deviceName || ''),
       activatedAt: nowIso(),
-      lastSeenAt: nowIso()
+      lastSeenAt: nowIso(),
+      firstSeenIp: String(ipAddress || ''),
+      lastSeenIp: String(ipAddress || '')
     });
   }
 
-  await license.save();
+  license.activations = activations;
+  await writeDb(db);
 
   const token = signToken({
     kind: 'officino-license',
     licenseId: license.id,
-    machineId: safeMachineId,
+    hardwareFingerprint: safeFingerprint,
     keyLast4: license.keyLast4,
     issuedAt: nowIso(),
     expiresAt: null
@@ -153,48 +214,91 @@ async function activateLicense({ activationKey, machineId, deviceName, ipAddress
   return { token, keyLast4: license.keyLast4 };
 }
 
-async function validateTokenAndTouch({ token, machineId, ipAddress }) {
-  await initDB();
-
+async function validateTokenAndTouch({ token, hardwareFingerprint, ipAddress }) {
   const payload = verifyToken(token);
   if (!payload) throw new Error('Invalid token.');
 
-  const license = await License.findOne({ id: payload.licenseId });
+  const db = await readDb();
+  const license = db.licenses.find((l) => l.id === payload.licenseId);
+
   if (!license) throw new Error('License not found.');
+  if (String(license.status || '').toUpperCase() !== 'ACTIVE') {
+    throw new Error('License is not active.');
+  }
 
-  const activation = license.activations.find(a => a.machineId === machineId);
-  if (!activation) throw new Error('Device not activated.');
+  const providedFingerprint = normalizeHardwareFingerprint(hardwareFingerprint);
+  const tokenFingerprint = normalizeHardwareFingerprint(payload.hardwareFingerprint);
+  const expectedFingerprint = tokenFingerprint || providedFingerprint;
+  if (!expectedFingerprint) {
+    throw new Error('Device fingerprint is missing.');
+  }
+  if (tokenFingerprint && providedFingerprint && tokenFingerprint !== providedFingerprint) {
+    throw new Error('Token does not match this device.');
+  }
 
-  activation.lastSeenAt = nowIso();
-  activation.lastSeenIp = ipAddress;
-
-  await license.save();
+  const activations = Array.isArray(license.activations) ? license.activations : [];
+  const existing = activations.find(
+    (a) => String(a.hardwareFingerprint || '') === expectedFingerprint
+  );
+  if (!existing) {
+    throw new Error('Device is not bound to this key.');
+  }
+  existing.lastSeenAt = nowIso();
+  existing.lastSeenIp = String(ipAddress || '');
+  existing.hardwareFingerprint = String(existing.hardwareFingerprint || expectedFingerprint);
+  license.activations = activations;
+  await writeDb(db);
 
   return { valid: true, keyLast4: license.keyLast4 };
 }
 
-async function deactivateLicense({ activationKey, machineId }) {
-  await initDB();
-
-  const keyHash = hashActivationKey(activationKey);
-  const license = await License.findOne({ keyHash });
+async function deactivateLicense({ activationKey, hardwareFingerprint }) {
+  const db = await readDb();
+  const license = findLicenseByKey(db, activationKey);
 
   if (!license) throw new Error('Invalid key.');
+  const safeFingerprint = normalizeHardwareFingerprint(hardwareFingerprint);
+  if (!safeFingerprint) throw new Error('hardwareFingerprint is required.');
 
-  license.activations = license.activations.filter(a => a.machineId !== machineId);
+  license.activations = (license.activations || []).filter(
+    (a) => String(a.hardwareFingerprint || '') !== safeFingerprint
+  );
 
-  await license.save();
+  await writeDb(db);
 
   return { removed: true };
+}
+
+async function unbindActivationById({ licenseId, hardwareFingerprint }) {
+  const db = await readDb();
+  const license = db.licenses.find((item) => item.id === licenseId);
+  if (!license) throw new Error('License not found.');
+  const safeFingerprint = normalizeHardwareFingerprint(hardwareFingerprint);
+  if (!safeFingerprint) throw new Error('hardwareFingerprint is required.');
+
+  const beforeCount = Array.isArray(license.activations) ? license.activations.length : 0;
+  license.activations = (license.activations || []).filter(
+    (a) => String(a.hardwareFingerprint || '') !== safeFingerprint
+  );
+  const removed = beforeCount - license.activations.length;
+  if (removed <= 0) {
+    throw new Error('Activation not found for this device.');
+  }
+
+  await writeDb(db);
+  return { removed: true, removedCount: removed };
 }
 
 module.exports = {
   createLicense,
   listLicenses,
+  listActivationOverview,
+  listDeviceHistory,
   getLicenseById,
   deactivateLicenseById,
   activateLicenseById,
   activateLicense,
   validateTokenAndTouch,
-  deactivateLicense
+  deactivateLicense,
+  unbindActivationById
 };
