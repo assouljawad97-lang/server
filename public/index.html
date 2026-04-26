@@ -46,15 +46,46 @@
             </div>
           </div>
           <div class="col-lg-6">
-            <div class="hero-card">
-              <h2 data-i18n="heroCard.title">What You Get</h2>
-              <ul>
-                <li data-i18n="heroCard.li1">Offline-first desktop app</li>
-                <li data-i18n="heroCard.li2">Scanner support (WIA/TWAIN + network)</li>
-                <li data-i18n="heroCard.li3">PDF tools and client history</li>
-                <li data-i18n="heroCard.li4">LAN sync with host/guest modes</li>
-                <li data-i18n="heroCard.li5">Activation and license validation</li>
-              </ul>
+            <div class="hero-slideshow" id="heroSlideshow">
+              <div class="slide-frame">
+                <article class="slide is-active" data-caption-key="slideshow.c0">
+                  <img src="/slideshow/capture-0.png" alt="Officino preview 0" loading="eager" />
+                </article>
+                <article class="slide" data-caption-key="slideshow.c1">
+                  <img src="/slideshow/capture-1.png" alt="Officino dashboard preview" loading="eager" />
+                </article>
+                <article class="slide" data-caption-key="slideshow.c2">
+                  <img src="/slideshow/capture-2.png" alt="Officino features preview" loading="lazy" />
+                </article>
+                <article class="slide" data-caption-key="slideshow.c3">
+                  <img src="/slideshow/capture-3.png" alt="Officino workflow preview" loading="lazy" />
+                </article>
+                <article class="slide" data-caption-key="slideshow.c4">
+                  <img src="/slideshow/capture-4.png" alt="Officino contact preview" loading="lazy" />
+                </article>
+                <article class="slide" data-caption-key="slideshow.c5">
+                  <img src="/slideshow/capture-5.png" alt="Officino admin panel preview" loading="lazy" />
+                </article>
+                <article class="slide" data-caption-key="slideshow.c6">
+                  <img src="/slideshow/capture-6.png" alt="Officino preview 6" loading="lazy" />
+                </article>
+                <article class="slide" data-caption-key="slideshow.c7">
+                  <img src="/slideshow/capture-7.png" alt="Officino preview 7" loading="lazy" />
+                </article>
+                <article class="slide" data-caption-key="slideshow.c8">
+                  <img src="/slideshow/capture-8.png" alt="Officino preview 8" loading="lazy" />
+                </article>
+                <div class="slide-brand-overlay">
+                  <img src="/slideshow/asset-logo.png" alt="Officino logo" />
+                  <span>Officino</span>
+                </div>
+              </div>
+              <div class="slide-caption" id="heroSlideCaption">Fast client operations with a clean office workflow.</div>
+              <div class="slide-controls">
+                <button type="button" class="slide-nav" id="slidePrev" aria-label="Previous slide">&#10094;</button>
+                <div class="slide-dots" id="slideDots"></div>
+                <button type="button" class="slide-nav" id="slideNext" aria-label="Next slide">&#10095;</button>
+              </div>
             </div>
           </div>
         </div>

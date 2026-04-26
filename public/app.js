@@ -12,12 +12,15 @@ const I18N = {
     'hero.kicker': 'Office workflow made simple',
     'hero.title': 'Administrative desktop software for fast, secure daily work.',
     'hero.text': 'Manage clients, applications, scans, documents, and activation from one clean platform designed for real offices.',
-    'heroCard.title': 'What You Get',
-    'heroCard.li1': 'Offline-first desktop app',
-    'heroCard.li2': 'Scanner support (WIA/TWAIN + network)',
-    'heroCard.li3': 'PDF tools and client history',
-    'heroCard.li4': 'LAN sync with host/guest modes',
-    'heroCard.li5': 'Activation and license validation',
+    'slideshow.c0': 'Real office screens, real daily workflow.',
+    'slideshow.c1': 'Fast client operations with a clean office workflow.',
+    'slideshow.c2': 'Feature-rich pages designed for daily admin tasks.',
+    'slideshow.c3': 'Simple step-by-step flow your team can follow quickly.',
+    'slideshow.c4': 'Built-in support channels for better customer communication.',
+    'slideshow.c5': 'Secure license administration from one panel.',
+    'slideshow.c6': 'Built to keep documents and history organized.',
+    'slideshow.c7': 'Simple navigation that office staff can use instantly.',
+    'slideshow.c8': 'Professional tools for faster case handling.',
     'features.title': 'Amazing features to make your work easier',
     'features.subtitle': 'Everything your office needs to process files quickly and accurately.',
     'features.f1Title': 'Client Management',
@@ -70,12 +73,15 @@ const I18N = {
     'hero.kicker': 'Flujo de oficina simplificado',
     'hero.title': 'Software de escritorio administrativo para trabajo diario rápido y seguro.',
     'hero.text': 'Gestiona clientes, solicitudes, escaneos, documentos y activación desde una plataforma limpia para oficinas reales.',
-    'heroCard.title': 'Qué obtienes',
-    'heroCard.li1': 'Aplicación de escritorio offline-first',
-    'heroCard.li2': 'Compatibilidad de escáner (WIA/TWAIN + red)',
-    'heroCard.li3': 'Herramientas PDF e historial del cliente',
-    'heroCard.li4': 'Sincronización LAN con modos host/invitado',
-    'heroCard.li5': 'Activación y validación de licencias',
+    'slideshow.c0': 'Pantallas reales de oficina para el trabajo diario real.',
+    'slideshow.c1': 'Operaciones de clientes rápidas con un flujo limpio de oficina.',
+    'slideshow.c2': 'Páginas con funciones completas para tareas administrativas diarias.',
+    'slideshow.c3': 'Flujo simple paso a paso para todo tu equipo.',
+    'slideshow.c4': 'Canales de soporte integrados para mejor comunicación con clientes.',
+    'slideshow.c5': 'Administración segura de licencias desde un solo panel.',
+    'slideshow.c6': 'Diseñado para mantener documentos e historial organizados.',
+    'slideshow.c7': 'Navegación simple para que el personal trabaje al instante.',
+    'slideshow.c8': 'Herramientas profesionales para gestionar casos más rápido.',
     'features.title': 'Funciones increíbles para facilitar tu trabajo',
     'features.subtitle': 'Todo lo que tu oficina necesita para procesar archivos con rapidez y precisión.',
     'features.f1Title': 'Gestión de clientes',
@@ -128,12 +134,15 @@ const I18N = {
     'hero.kicker': 'تنظيم العمل المكتبي بشكل أسهل',
     'hero.title': 'برنامج مكتبي إداري للعمل اليومي بسرعة وأمان.',
     'hero.text': 'إدارة العملاء والطلبات والمسح الضوئي والملفات والتفعيل من منصة واحدة واضحة ومناسبة للمكاتب.',
-    'heroCard.title': 'ماذا ستحصل',
-    'heroCard.li1': 'تطبيق مكتبي يعمل بدون إنترنت',
-    'heroCard.li2': 'دعم الماسحات (WIA/TWAIN + شبكة)',
-    'heroCard.li3': 'أدوات PDF وتاريخ العميل',
-    'heroCard.li4': 'مزامنة LAN بوضع المضيف والضيف',
-    'heroCard.li5': 'تفعيل الرخص والتحقق منها',
+    'slideshow.c0': 'شاشات مكتبية حقيقية لسير عمل يومي واقعي.',
+    'slideshow.c1': 'عمليات عملاء سريعة ضمن سير عمل مكتبي واضح.',
+    'slideshow.c2': 'صفحات غنية بالميزات للمهام الإدارية اليومية.',
+    'slideshow.c3': 'خطوات سهلة وواضحة يمكن للفريق اتباعها بسرعة.',
+    'slideshow.c4': 'قنوات دعم مدمجة لتواصل أفضل مع العملاء.',
+    'slideshow.c5': 'إدارة آمنة للتراخيص من لوحة واحدة.',
+    'slideshow.c6': 'مصمم لتنظيم الملفات وسجل العميل بشكل أفضل.',
+    'slideshow.c7': 'تنقل بسيط يمكن لفريق المكتب استخدامه فوراً.',
+    'slideshow.c8': 'أدوات احترافية لمعالجة القضايا بسرعة أكبر.',
     'features.title': 'مميزات قوية لتسهيل عملك',
     'features.subtitle': 'كل ما يحتاجه مكتبك لمعالجة الملفات بسرعة ودقة.',
     'features.f1Title': 'إدارة العملاء',
@@ -219,6 +228,67 @@ function bindLanguageSelect() {
   select.addEventListener('change', () => applyLanguage(select.value));
 }
 
+function bindHeroSlideshow() {
+  const root = document.getElementById('heroSlideshow');
+  if (!root) return;
+  const slides = Array.from(root.querySelectorAll('.slide'));
+  if (!slides.length) return;
+  const dotsWrap = document.getElementById('slideDots');
+  const prevBtn = document.getElementById('slidePrev');
+  const nextBtn = document.getElementById('slideNext');
+  const caption = document.getElementById('heroSlideCaption');
+  let current = 0;
+  let timer = null;
+
+  const dots = slides.map((_, idx) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = `slide-dot${idx === 0 ? ' is-active' : ''}`;
+    dot.setAttribute('aria-label', `Slide ${idx + 1}`);
+    dot.addEventListener('click', () => {
+      setSlide(idx);
+      restartTimer();
+    });
+    dotsWrap?.appendChild(dot);
+    return dot;
+  });
+
+  function setCaption(index) {
+    if (!caption) return;
+    const key = slides[index]?.dataset?.captionKey || '';
+    if (key) {
+      caption.setAttribute('data-i18n', key);
+    } else {
+      caption.removeAttribute('data-i18n');
+    }
+    caption.textContent = I18N[resolveLanguage()]?.[key] || I18N.en[key] || '';
+  }
+
+  function setSlide(index) {
+    current = (index + slides.length) % slides.length;
+    slides.forEach((slide, idx) => slide.classList.toggle('is-active', idx === current));
+    dots.forEach((dot, idx) => dot.classList.toggle('is-active', idx === current));
+    setCaption(current);
+  }
+
+  function restartTimer() {
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => setSlide(current + 1), 5000);
+  }
+
+  prevBtn?.addEventListener('click', () => {
+    setSlide(current - 1);
+    restartTimer();
+  });
+  nextBtn?.addEventListener('click', () => {
+    setSlide(current + 1);
+    restartTimer();
+  });
+
+  setSlide(0);
+  restartTimer();
+}
+
 function bindOrderForm() {
   const form = document.getElementById('orderForm');
   if (!form) return;
@@ -280,3 +350,4 @@ bindLanguageSelect();
 applyLanguage(resolveLanguage());
 loadMeta();
 bindOrderForm();
+bindHeroSlideshow();

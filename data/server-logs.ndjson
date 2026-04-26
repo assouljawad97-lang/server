@@ -19,3 +19,5 @@
 {"ts":"2026-04-25T22:53:21.679Z","level":"INFO","message":"order responded","meta":{"orderId":"b818e018-7139-48a1-8e7c-5829752cd0d1","by":"admin"}}
 {"ts":"2026-04-25T23:02:29.198Z","level":"INFO","message":"order received","meta":{"orderId":"6e2fd9a9-0fe3-4885-a981-8aaa32c22e30","email":"assouljawad97@gmail.com"}}
 {"ts":"2026-04-25T23:06:10.728Z","level":"INFO","message":"order received","meta":{"orderId":"0c1a5d18-82ab-4380-b150-93912e33627d","email":"assouljawad97@gmail.com"}}
+{"ts":"2026-04-26T19:31:44.751Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
+{"ts":"2026-04-26T20:05:15.801Z","level":"INFO","message":"server started on http://0.0.0.0:8080","meta":null}
