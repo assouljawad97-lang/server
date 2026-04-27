@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -27,7 +27,7 @@
           <option value="es">Español</option>
           <option value="ar">Arabic</option>
         </select>
-        <a id="downloadWindows" class="btn btn-primary" href="https://drive.google.com/file/d/141j-uqn6mnT1XGWzAhR9r782Sqtz63zo/view" target="_blank" rel="noopener" data-i18n="buttons.windows">Windows</a>
+        <a id="downloadWindows" class="btn btn-primary" href="#" target="_blank" rel="noopener" data-i18n="buttons.windows">Windows</a>
       </div>
     </div>
   </header>
@@ -35,59 +35,142 @@
   <main>
     <section class="hero-section">
       <div class="container-xl">
-        <div class="row align-items-center g-4">
-          <div class="col-lg-6">
+        <div class="row align-items-center g-4 hero-layout">
+          <div class="col-lg-5">
             <p class="hero-kicker" data-i18n="hero.kicker">Office workflow made simple</p>
             <h1 class="hero-title" data-i18n="hero.title">Administrative desktop software for fast, secure daily work.</h1>
             <p class="hero-text" data-i18n="hero.text">Manage clients, applications, scans, documents, and activation from one clean platform designed for real offices.</p>
             <div class="d-flex flex-wrap gap-2">
-              <a id="downloadWindowsHero" class="btn btn-dark btn-lg" href="https://drive.google.com/file/d/141j-uqn6mnT1XGWzAhR9r782Sqtz63zo/view" target="_blank" rel="noopener" data-i18n="buttons.downloadWindows">Download for Windows</a>
+              <a id="downloadWindowsHero" class="btn btn-dark btn-lg" href="#" target="_blank" rel="noopener" data-i18n="buttons.downloadWindows">Download for Windows</a>
               <a id="orderNowHero" class="btn btn-light btn-lg border" href="/order" data-i18n="buttons.downloadOrder">Order Your Copy</a>
             </div>
           </div>
-          <div class="col-lg-6">
-            <div class="hero-slideshow" id="heroSlideshow">
-              <div class="slide-frame">
-                <article class="slide is-active" data-caption-key="slideshow.c0">
-                  <img src="/slideshow/capture-0.png" alt="Officino preview 0" loading="eager" />
-                </article>
-                <article class="slide" data-caption-key="slideshow.c1">
-                  <img src="/slideshow/capture-1.png" alt="Officino dashboard preview" loading="eager" />
-                </article>
-                <article class="slide" data-caption-key="slideshow.c2">
-                  <img src="/slideshow/capture-2.png" alt="Officino features preview" loading="lazy" />
-                </article>
-                <article class="slide" data-caption-key="slideshow.c3">
-                  <img src="/slideshow/capture-3.png" alt="Officino workflow preview" loading="lazy" />
-                </article>
-                <article class="slide" data-caption-key="slideshow.c4">
-                  <img src="/slideshow/capture-4.png" alt="Officino contact preview" loading="lazy" />
-                </article>
-                <article class="slide" data-caption-key="slideshow.c5">
-                  <img src="/slideshow/capture-5.png" alt="Officino admin panel preview" loading="lazy" />
-                </article>
-                <article class="slide" data-caption-key="slideshow.c6">
-                  <img src="/slideshow/capture-6.png" alt="Officino preview 6" loading="lazy" />
-                </article>
-                <article class="slide" data-caption-key="slideshow.c7">
-                  <img src="/slideshow/capture-7.png" alt="Officino preview 7" loading="lazy" />
-                </article>
-                <article class="slide" data-caption-key="slideshow.c8">
-                  <img src="/slideshow/capture-8.png" alt="Officino preview 8" loading="lazy" />
-                </article>
-                <div class="slide-brand-overlay">
-                  <img src="/slideshow/asset-logo.png" alt="Officino logo" />
-                  <span>Officino</span>
-                </div>
-              </div>
-              <div class="slide-caption" id="heroSlideCaption">Fast client operations with a clean office workflow.</div>
-              <div class="slide-controls">
-                <button type="button" class="slide-nav" id="slidePrev" aria-label="Previous slide">&#10094;</button>
-                <div class="slide-dots" id="slideDots"></div>
-                <button type="button" class="slide-nav" id="slideNext" aria-label="Next slide">&#10095;</button>
-              </div>
+          <div class="col-lg-7">
+            <img class="hero-custom-image" src="/hero.png" alt="Officino hero" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero-cards-section">
+      <div class="container-xl">
+        <div class="hero-mini-cards">
+          <article class="hero-mini-card">
+            <span class="hero-mini-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 4 5v6c0 5 3.4 9.5 8 10.9 4.6-1.4 8-5.9 8-10.9V5l-8-3Z" stroke="currentColor" stroke-width="1.9"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <h4 data-i18n="hero.card1Title">Offline First</h4>
+            <p data-i18n="hero.card1Text">Works without internet</p>
+          </article>
+          <article class="hero-mini-card">
+            <span class="hero-mini-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5h6l2 2H21v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M3 9.5V6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v1.5" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>
+            </span>
+            <h4 data-i18n="hero.card2Title">All-in-One</h4>
+            <p data-i18n="hero.card2Text">Clients, documents, calendar & more</p>
+          </article>
+          <article class="hero-mini-card">
+            <span class="hero-mini-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.9"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="15" r="1.2" fill="currentColor"/></svg>
+            </span>
+            <h4 data-i18n="hero.card3Title">Secure</h4>
+            <p data-i18n="hero.card3Text">Your data stays on your device</p>
+          </article>
+          <article class="hero-mini-card">
+            <span class="hero-mini-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.9"/><path d="M12 12 16 9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12 12V7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+            </span>
+            <h4 data-i18n="hero.card4Title">Productive</h4>
+            <p data-i18n="hero.card4Text">Built for speed and efficiency</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="reports-overview-section">
+      <div class="container-xl">
+        <div class="section-head text-center">
+          <h2 data-i18n="reports.title">Client Packages & Business Reports</h2>
+          <p data-i18n="reports.subtitle">Import/export clients and generate key office reports in seconds.</p>
+        </div>
+        <div class="reports-grid">
+          <article class="report-card">
+            <img src="/slidshow/capture-4.png" alt="Client import and export" />
+            <div class="report-card-body">
+              <h3 data-i18n="reports.importExportTitle">Client Import / Export</h3>
+              <p data-i18n="reports.importExportText">Export a single client with full history and files, or import a package safely.</p>
+            </div>
+          </article>
+          <article class="report-card">
+            <img src="/slidshow/capture-3.png" alt="Payments and activity reports" />
+            <div class="report-card-body">
+              <h3 data-i18n="reports.paymentTitle">Payments & Activity Reports</h3>
+              <p data-i18n="reports.paymentText">Generate payment and activity reports by date range for quick financial and workflow tracking.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="compare-section">
+      <div class="container-xl">
+        <div class="section-head text-center mb-4">
+          <h2 class="compare-title">
+            <span data-i18n="compare.titleA">From dispersion to</span>
+            <span class="compare-accent" data-i18n="compare.titleB">total control.</span>
+          </h2>
+          <p data-i18n="compare.subtitle">Immediate transformation from day one.</p>
+        </div>
+
+        <div class="compare-board">
+          <div class="compare-col compare-col-left">
+            <div class="compare-col-head" data-i18n="compare.leftHead">WITHOUT OFFICINO</div>
+            <div class="compare-row"><span class="compare-icon compare-icon-bad">✕</span><span data-i18n="compare.left1">Excel files and physical folders</span></div>
+            <div class="compare-row"><span class="compare-icon compare-icon-bad">✕</span><span data-i18n="compare.left2">Missed deadlines and constant emergencies</span></div>
+            <div class="compare-row"><span class="compare-icon compare-icon-bad">✕</span><span data-i18n="compare.left3">Constant client calls asking for updates</span></div>
+            <div class="compare-row"><span class="compare-icon compare-icon-bad">✕</span><span data-i18n="compare.left4">Overdue or lost invoices</span></div>
+            <div class="compare-row"><span class="compare-icon compare-icon-bad">✕</span><span data-i18n="compare.left5">No clear business visibility</span></div>
+            <div class="compare-impact compare-impact-bad">
+              <strong data-i18n="compare.leftImpactValue">-€2,000/month</strong>
+              <small data-i18n="compare.leftImpactText">lost productivity</small>
             </div>
           </div>
+
+          <div class="compare-divider" aria-hidden="true"></div>
+
+          <div class="compare-col compare-col-good">
+            <div class="compare-col-head" data-i18n="compare.rightHead">WITH OFFICINO</div>
+            <div class="compare-row"><span class="compare-icon compare-icon-good">✓</span><span data-i18n="compare.right1">Centralized and searchable digital records</span></div>
+            <div class="compare-row"><span class="compare-icon compare-icon-good">✓</span><span data-i18n="compare.right2">Automatic expiration and deadline alerts</span></div>
+            <div class="compare-row"><span class="compare-icon compare-icon-good">✓</span><span data-i18n="compare.right3">Real-time application status tracking</span></div>
+            <div class="compare-row"><span class="compare-icon compare-icon-good">✓</span><span data-i18n="compare.right4">Integrated payment and activity reports</span></div>
+            <div class="compare-row"><span class="compare-icon compare-icon-good">✓</span><span data-i18n="compare.right5">Clear overview of office operations</span></div>
+            <div class="compare-impact compare-impact-good">
+              <strong data-i18n="compare.rightImpactValue">+20h/week</strong>
+              <small data-i18n="compare.rightImpactText">recovered since day one</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="section-block alt gallery-section">
+      <div class="container-xl">
+        <div class="section-head text-center">
+          <h2 data-i18n="gallery.title">Officino Gallery</h2>
+          <p data-i18n="gallery.subtitle">A quick look at the real screens your team uses every day.</p>
+        </div>
+        <div class="gallery-slideshow">
+          <button id="galleryPrev" class="gallery-nav" type="button" data-i18n="gallery.prev" aria-label="Previous slide">‹</button>
+          <figure class="gallery-main">
+            <img id="galleryImage" src="/slidshow/slide-01.png" alt="Officino screenshot" />
+          </figure>
+          <button id="galleryNext" class="gallery-nav" type="button" data-i18n="gallery.next" aria-label="Next slide">›</button>
+        </div>
+        <div class="gallery-meta">
+          <span id="galleryCounter">1 / 14</span>
+        </div>
+        <div id="galleryDots" class="gallery-dots" aria-label="Slideshow dots">
         </div>
       </div>
     </section>
@@ -99,10 +182,10 @@
           <p data-i18n="features.subtitle">Everything your office needs to process files quickly and accurately.</p>
         </div>
         <div class="feature-grid">
-          <article class="feature-item"><h3 data-i18n="features.f1Title">Client Management</h3><p data-i18n="features.f1Text">Track each customer with full application history and statuses.</p></article>
-          <article class="feature-item"><h3 data-i18n="features.f2Title">Smart Document Flow</h3><p data-i18n="features.f2Text">Import, preview, scan, and manage files from one place.</p></article>
-          <article class="feature-item"><h3 data-i18n="features.f3Title">PDF Productivity</h3><p data-i18n="features.f3Text">Merge, compress, crop, split, and convert with simple tools.</p></article>
-          <article class="feature-item"><h3 data-i18n="features.f4Title">LAN Collaboration</h3><p data-i18n="features.f4Text">Run host/guest mode so your team works from one shared source.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f1Title">Offline-first desktop app</h3><p data-i18n="features.f1Text">Reliable daily workflow even without internet connection.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f2Title">Scanner support (WIA/TWAIN + network)</h3><p data-i18n="features.f2Text">Use local and LAN scanners in one integrated workflow.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f3Title">PDF tools and client history</h3><p data-i18n="features.f3Text">Handle files and track application history in one place.</p></article>
+          <article class="feature-item"><h3 data-i18n="features.f4Title">LAN sync with host/guest modes</h3><p data-i18n="features.f4Text">Connect office devices to collaborate over local network.</p></article>
           <article class="feature-item"><h3 data-i18n="features.f6Title">Built for Real Offices</h3><p data-i18n="features.f6Text">Fast interface, clear steps, and multilingual support.</p></article>
         </div>
       </div>
@@ -135,7 +218,7 @@
       <div class="container-xl">
         <div class="section-head text-center">
           <h2 data-i18n="contact.title">Let's Stay Connected</h2>
-          <p data-i18n="contact.subtitle">Need setup help or activation support? We’re ready to assist.</p>
+          <p data-i18n="contact.subtitle">Need setup help or activation support? We're ready to assist.</p>
         </div>
         <div class="contact-card">
           <div class="row g-3 align-items-stretch">
@@ -172,3 +255,4 @@
   <script src="/app.js"></script>
 </body>
 </html>
+
