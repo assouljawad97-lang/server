@@ -96,7 +96,6 @@ html[lang="es"] body {
   width: 100%;
   height: auto;
   border-radius: 16px;
-  box-shadow: 0 14px 36px rgba(23, 40, 89, 0.12);
 }
 
 .hero-kicker {
@@ -359,6 +358,80 @@ html[lang="es"] body {
   color: #556486;
 }
 
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.blog-card {
+  background: #fff;
+  border: 1px solid #dfe7f6;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(23, 40, 89, 0.08);
+}
+
+.blog-card-cover {
+  height: 170px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.blog-chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(12, 47, 115, 0.92);
+  color: #fff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.blog-card-body {
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.blog-card-body h3 {
+  margin: 0.3rem 0 0.6rem;
+  color: #122a5f;
+}
+
+.blog-meta {
+  color: #6c7ea5;
+  font-size: 0.9rem;
+}
+
+.blog-link {
+  text-decoration: none;
+  color: #2c4cb0;
+  font-weight: 700;
+}
+
+.blog-post-single {
+  max-width: 980px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #dfe7f6;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.blog-post-content {
+  margin-top: 0.8rem;
+  color: #243a66;
+  line-height: 1.7;
+}
+
+.blog-post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
 .hero-mini-card {
   background: #ffffff;
   border: 1px solid #e6ebf6;
@@ -481,7 +554,6 @@ html[lang="es"] body {
 .contact-note {
   color: #4d5a7d;
   font-size: 0.95rem;
-  text-align: center;
 }
 
 .contact-card a {
@@ -521,6 +593,10 @@ html[lang="es"] body {
   }
 
   .reports-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-grid {
     grid-template-columns: 1fr;
   }
 

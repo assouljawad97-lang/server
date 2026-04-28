@@ -6,6 +6,7 @@ let managerModal = null;
 let licenseModal = null;
 let orderResponseModal = null;
 let currentPage = 'licenses';
+let blogEditor = null;
 
 function getAdminToken() {
   return sessionStorage.getItem(STORAGE_KEY) || '';
@@ -56,6 +57,7 @@ function setAuthenticatedUi(isAuth) {
   document.getElementById('adminListCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'licenses');
   document.getElementById('adminActivationsCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'activations');
   document.getElementById('adminOrdersCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'orders');
+  document.getElementById('adminBlogCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'blog');
   document.getElementById('adminDevicesCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'devices');
   document.getElementById('adminLogsCard')?.classList.toggle('d-none', !isAuth || currentPage !== 'logs');
   document.getElementById('adminSidebar')?.classList.toggle('d-none', !isAuth);
@@ -73,6 +75,14 @@ function statusBadge(status) {
     cls = 'bg-danger-subtle text-danger';
   }
   return `<span class="badge ${cls}">${normalized || '-'}</span>`;
+}
+
+function blogStatusBadge(status) {
+  const normalized = String(status || '').toUpperCase();
+  if (normalized === 'PUBLISHED') {
+    return '<span class="badge bg-success-subtle text-success fw-semibold">Published</span>';
+  }
+  return '<span class="badge bg-secondary-subtle text-secondary fw-semibold">Draft</span>';
 }
 
 function setNewOrdersSidebarBadge(count) {
@@ -254,6 +264,64 @@ async function loadOrders() {
   });
 }
 
+async function loadBlogs() {
+  const body = document.getElementById('blogTableBody');
+  if (!body) return;
+  body.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+  const data = await fetchJson('/api/admin/blogs', { headers: authHeaders() });
+  const rows = Array.isArray(data.posts) ? data.posts : [];
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="4">No posts yet.</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map((item) => `
+    <tr>
+      <td>${escapeHtml(item.title || '-')}</td>
+      <td>${blogStatusBadge(item.status)}</td>
+      <td>${fmtDate(item.updatedAt || item.createdAt)}</td>
+      <td class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-primary" data-action="edit-blog" data-id="${escapeHtml(item.id)}">Edit</button>
+        <button class="btn btn-sm btn-outline-danger" data-action="delete-blog" data-id="${escapeHtml(item.id)}">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+  body.querySelectorAll('[data-action="edit-blog"]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const row = rows.find((r) => String(r.id) === String(btn.dataset.id));
+      if (!row) return;
+      document.getElementById('blogPostId').value = row.id || '';
+      document.getElementById('blogTitle').value = row.title || '';
+      document.getElementById('blogCategory').value = row.category || '';
+      document.getElementById('blogReadTime').value = String(row.readingMinutes || 5);
+      document.getElementById('blogCoverUrl').value = row.coverImageUrl || '';
+      document.getElementById('blogSummary').value = row.summary || '';
+      blogEditor?.setHTML(row.contentHtml || '');
+      const wc = document.getElementById('blogWordCount');
+      if (wc) {
+        const text = String(blogEditor?.getText() || '').trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        wc.textContent = `${words} words`;
+      }
+      document.getElementById('blogStatus').value = String(row.status || 'DRAFT').toUpperCase() === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT';
+      document.getElementById('blogResult').textContent = 'Editing post...';
+    });
+  });
+  body.querySelectorAll('[data-action="delete-blog"]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!window.confirm('Delete this post?')) return;
+      try {
+        await fetchJson(`/api/admin/blogs/${encodeURIComponent(btn.dataset.id || '')}`, {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        await loadBlogs();
+      } catch (error) {
+        alert(String(error.message || error));
+      }
+    });
+  });
+}
+
 function openOrderResponseModal(order) {
   currentOrder = order;
   const customer = document.getElementById('orderModalCustomer');
@@ -379,6 +447,7 @@ async function loadCurrentPage() {
   if (currentPage === 'licenses') return loadLicenses();
   if (currentPage === 'activations') return loadActivations();
   if (currentPage === 'orders') return loadOrders();
+  if (currentPage === 'blog') return loadBlogs();
   if (currentPage === 'devices') return loadDevices();
   if (currentPage === 'logs') return loadLogs();
   return loadLicenses();
@@ -451,6 +520,7 @@ function bindToolbar() {
   document.getElementById('refreshActivationsBtn')?.addEventListener('click', () => loadActivations().catch((error) => alert(String(error.message || error))));
   document.getElementById('refreshOrdersBtn')?.addEventListener('click', () => loadOrders().catch((error) => alert(String(error.message || error))));
   document.getElementById('refreshDevicesBtn')?.addEventListener('click', () => loadDevices().catch((error) => alert(String(error.message || error))));
+  document.getElementById('refreshBlogBtn')?.addEventListener('click', () => loadBlogs().catch((error) => alert(String(error.message || error))));
   document.getElementById('refreshLogsBtn')?.addEventListener('click', () => loadLogs().catch((error) => alert(String(error.message || error))));
   document.getElementById('logLevelFilter')?.addEventListener('change', () => loadLogs().catch((error) => alert(String(error.message || error))));
   document.getElementById('openManagerBtn')?.addEventListener('click', () => {
@@ -460,6 +530,184 @@ function bindToolbar() {
       alertBox.textContent = '';
     }
     managerModal.show();
+  });
+}
+
+function bindBlogForm() {
+  const form = document.getElementById('blogForm');
+  const result = document.getElementById('blogResult');
+  const htmlField = document.getElementById('blogContentHtml');
+  const wordCount = document.getElementById('blogWordCount');
+  if (!form || !result) return;
+  const updateWordCount = () => {
+    if (!blogEditor || !wordCount) return;
+    const text = String(blogEditor.getText() || '').trim();
+    const words = text ? text.split(/\s+/).length : 0;
+    wordCount.textContent = `${words} words`;
+  };
+  document.querySelectorAll('#blogEditorToolbar [data-editor-action]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const action = String(btn.getAttribute('data-editor-action') || '');
+      if (!blogEditor) return;
+      if (action === 'h1') blogEditor.setHeading(1);
+      else if (action === 'h2') blogEditor.setHeading(2);
+      else if (action === 'h3') blogEditor.setHeading(3);
+      else if (action === 'bold') blogEditor.toggleBold();
+      else if (action === 'italic') blogEditor.toggleItalic();
+      else if (action === 'underline') blogEditor.toggleUnderline();
+      else if (action === 'olist') blogEditor.toggleOrderedList();
+      else if (action === 'ulist') blogEditor.toggleBulletList();
+      else if (action === 'quote') blogEditor.toggleBlockquote();
+      else if (action === 'code') blogEditor.toggleCodeBlock();
+      else if (action === 'left') blogEditor.setAlign('left');
+      else if (action === 'center') blogEditor.setAlign('center');
+      else if (action === 'right') blogEditor.setAlign('right');
+      else if (action === 'link') {
+        const url = window.prompt('Enter URL');
+        if (url !== null) blogEditor.setLink(url);
+      } else if (action === 'image') {
+        document.getElementById('blogInsertImageFile')?.click();
+      } else if (action === 'image-url') {
+        const url = window.prompt('Paste image URL');
+        if (url) blogEditor.insertImage(url.trim());
+      } else if (action === 'divider') blogEditor.insertDivider();
+      else if (action === 'clear') blogEditor.clearFormatting();
+      else if (action === 'undo') blogEditor.undo();
+      else if (action === 'redo') blogEditor.redo();
+    });
+  });
+  document.getElementById('blogInsertImageFile')?.addEventListener('change', async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const payload = await fetchJson('/api/admin/blogs/upload-image', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ dataUrl })
+      });
+      const url = payload.url || '';
+      if (!url) return;
+      const coverField = document.getElementById('blogCoverUrl');
+      if (coverField && !coverField.value.trim()) coverField.value = url;
+      blogEditor?.insertImage(url);
+      updateWordCount();
+    } catch (error) {
+      result.className = 'small mt-2 text-danger';
+      result.textContent = String(error.message || error);
+    } finally {
+      event.target.value = '';
+    }
+  });
+  document.getElementById('blogCoverInput')?.addEventListener('change', async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const payload = await fetchJson('/api/admin/blogs/upload-image', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ dataUrl })
+      });
+      const url = payload.url || '';
+      if (!url) return;
+      const coverField = document.getElementById('blogCoverUrl');
+      if (coverField) coverField.value = url;
+      result.className = 'small mt-2 text-success';
+      result.textContent = 'Cover image uploaded.';
+    } catch (error) {
+      result.className = 'small mt-2 text-danger';
+      result.textContent = String(error.message || error);
+    } finally {
+      event.target.value = '';
+    }
+  });
+  document.getElementById('blogResetBtn')?.addEventListener('click', () => {
+    form.reset();
+    document.getElementById('blogPostId').value = '';
+    document.getElementById('blogCoverUrl').value = '';
+    document.getElementById('blogReadTime').value = '5';
+    blogEditor?.clear();
+    if (htmlField) htmlField.value = '';
+    updateWordCount();
+    result.className = 'small mt-2 text-muted';
+    result.textContent = '';
+  });
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const id = (document.getElementById('blogPostId')?.value || '').trim();
+    const contentHtml = String(blogEditor?.getHTML() || '').trim();
+    if (htmlField) htmlField.value = contentHtml;
+    const payload = {
+      title: document.getElementById('blogTitle')?.value?.trim() || '',
+      category: document.getElementById('blogCategory')?.value?.trim() || '',
+      summary: document.getElementById('blogSummary')?.value?.trim() || '',
+      contentHtml,
+      coverImageUrl: document.getElementById('blogCoverUrl')?.value?.trim() || '',
+      readingMinutes: Number(document.getElementById('blogReadTime')?.value || 5),
+      status: document.getElementById('blogStatus')?.value || 'DRAFT'
+    };
+    if (!payload.title || !payload.summary || !payload.contentHtml) {
+      result.className = 'small mt-2 text-danger';
+      result.textContent = 'Title, summary, and content are required.';
+      return;
+    }
+    try {
+      if (id) {
+        await fetchJson(`/api/admin/blogs/${encodeURIComponent(id)}`, {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify(payload)
+        });
+      } else {
+        await fetchJson('/api/admin/blogs', {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify(payload)
+        });
+      }
+      form.reset();
+      document.getElementById('blogPostId').value = '';
+      blogEditor?.clear();
+      updateWordCount();
+      result.className = 'small mt-2 text-success';
+      result.textContent = 'Post saved successfully.';
+      await loadBlogs();
+    } catch (error) {
+      result.className = 'small mt-2 text-danger';
+      result.textContent = String(error.message || error);
+    }
+  });
+  if (blogEditor && typeof blogEditor.onUpdate === 'function') {
+    blogEditor.onUpdate(updateWordCount);
+  }
+  updateWordCount();
+}
+
+function initBlogEditor() {
+  const editorRoot = document.getElementById('blogContentEditor');
+  if (!editorRoot || !window.OfficinoTipTapBundle || typeof window.OfficinoTipTapBundle.createEditor !== 'function') return;
+  if (blogEditor) return;
+  const updateWordCount = () => {
+    const wordCount = document.getElementById('blogWordCount');
+    if (!blogEditor || !wordCount) return;
+    const text = String(blogEditor.getText() || '').trim();
+    const words = text ? text.split(/\s+/).length : 0;
+    wordCount.textContent = `${words} words`;
+  };
+  blogEditor = window.OfficinoTipTapBundle.createEditor({
+    element: editorRoot,
+    onUpdate: updateWordCount
+  });
+  updateWordCount();
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error('Failed to read image.'));
+    reader.readAsDataURL(file);
   });
 }
 
@@ -544,9 +792,9 @@ function bindOrderActions() {
     const subject = document.getElementById('orderResponseSubject')?.value?.trim() || '';
     const message = document.getElementById('orderResponseMessage')?.value?.trim() || '';
     const activationKey = document.getElementById('orderResponseKey')?.value?.trim() || '';
-    if (!subject || !message) {
+    if (!subject || !message || !activationKey) {
       result.className = 'small mt-2 text-danger';
-      result.textContent = 'Subject and message are required.';
+      result.textContent = 'Subject, message, and activation key are required.';
       return;
     }
     const saveBtn = document.getElementById('orderSaveResponseBtn');
@@ -609,6 +857,8 @@ function init() {
   bindToolbar();
   bindSidebarNav();
   bindCreateForm();
+  initBlogEditor();
+  bindBlogForm();
   bindLicenseActions();
   bindOrderActions();
   setAuthenticatedUi(false);

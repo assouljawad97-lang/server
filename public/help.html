@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Officino Help</title>
+  <link rel="stylesheet" href="/bootstrap.min.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container-xl d-flex align-items-center justify-content-between py-3">
+      <a href="/" class="brand">
+        <span><img src="/logo.png" alt="Officino" width="50" height="50" /></span>
+        <span class="brand-text">Officino</span>
+      </a>
+      <div class="d-flex gap-2 align-items-center header-actions">
+        <select id="langSelect" class="form-select form-select-sm lang-select" aria-label="Language">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="ar">Arabic</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="section-block">
+    <div class="container-xl">
+      <div class="section-head text-center">
+        <h1 data-i18n="help.title">Help Center</h1>
+        <p data-i18n="help.subtitle">We are preparing clear guides and troubleshooting help for your team.</p>
+      </div>
+      <div class="contact-card mx-auto">
+        <h3 data-i18n="help.comingSoonTitle">Coming soon</h3>
+        <p class="mb-2" data-i18n="help.comingSoonText">This page will include setup guides, scanner troubleshooting, and backup/restore help.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
+

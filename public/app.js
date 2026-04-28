@@ -5,6 +5,8 @@ const I18N = {
   en: {
     'nav.features': 'Features',
     'nav.howItWorks': 'How It Works',
+    'nav.blog': 'Blog',
+    'nav.help': 'Help',
     'nav.support': 'Support',
     'buttons.windows': 'Windows',
     'buttons.downloadWindows': 'Download for Windows',
@@ -78,7 +80,6 @@ const I18N = {
     'contact.emailTitle': 'Email Support',
     'contact.emailText': 'Send screenshots or detailed issues by email.',
     'contact.emailAction': 'Send Email',
-    'contact.note': 'Support contact: +34 642 190 408 · assouljawad823@gmail.com',
     'footer.rights': 'All rights reserved.',
     'footer.privacy': 'Privacy Policy',
     'footer.terms': 'Terms and Conditions',
@@ -90,11 +91,19 @@ const I18N = {
     'order.phone': 'Phone Number',
     'order.submit': 'Submit Order',
     'order.success': 'Order received successfully. We will contact you soon.',
-    'order.error': 'Could not submit your order. Please try again.'
+    'order.error': 'Could not submit your order. Please try again.',
+    'blog.title': 'Officino Blog',
+    'blog.subtitle': 'Latest updates, new features, and product improvements.',
+    'help.title': 'Help Center',
+    'help.subtitle': 'We are preparing clear guides and troubleshooting help for your team.',
+    'help.comingSoonTitle': 'Coming soon',
+    'help.comingSoonText': 'This page will include setup guides, scanner troubleshooting, and backup/restore help.'
   },
   es: {
     'nav.features': 'Funciones',
     'nav.howItWorks': 'Cómo funciona',
+    'nav.blog': 'Blog',
+    'nav.help': 'Ayuda',
     'nav.support': 'Soporte',
     'buttons.windows': 'Windows',
     'buttons.downloadWindows': 'Descargar para Windows',
@@ -168,7 +177,6 @@ const I18N = {
     'contact.emailTitle': 'Soporte por email',
     'contact.emailText': 'Envía capturas o incidencias detalladas por correo.',
     'contact.emailAction': 'Enviar email',
-    'contact.note': 'Contacto de soporte: +34 642 190 408 · assouljawad823@gmail.com',
     'footer.rights': 'Todos los derechos reservados.',
     'footer.privacy': 'Política de privacidad',
     'footer.terms': 'Términos y condiciones',
@@ -180,11 +188,19 @@ const I18N = {
     'order.phone': 'Número de teléfono',
     'order.submit': 'Enviar solicitud',
     'order.success': 'Solicitud recibida correctamente. Te contactaremos pronto.',
-    'order.error': 'No se pudo enviar la solicitud. Inténtalo de nuevo.'
+    'order.error': 'No se pudo enviar la solicitud. Inténtalo de nuevo.',
+    'blog.title': 'Blog de Officino',
+    'blog.subtitle': 'Novedades, nuevas funciones y mejoras del producto.',
+    'help.title': 'Centro de ayuda',
+    'help.subtitle': 'Estamos preparando guías claras y ayuda de resolución de problemas para tu equipo.',
+    'help.comingSoonTitle': 'Próximamente',
+    'help.comingSoonText': 'Esta página incluirá guías de configuración, solución de escáner y ayuda de copias de seguridad.'
   },
   ar: {
     'nav.features': 'المميزات',
     'nav.howItWorks': 'طريقة العمل',
+    'nav.blog': 'المدونة',
+    'nav.help': 'المساعدة',
     'nav.support': 'الدعم',
     'buttons.windows': 'ويندوز',
     'buttons.downloadWindows': 'تحميل لويندوز',
@@ -258,7 +274,6 @@ const I18N = {
     'contact.emailTitle': 'دعم البريد الإلكتروني',
     'contact.emailText': 'أرسل صور الشاشة أو تفاصيل المشكلة عبر البريد.',
     'contact.emailAction': 'إرسال بريد',
-    'contact.note': 'الدعم: +34 642 190 408 · assouljawad823@gmail.com',
     'footer.rights': 'جميع الحقوق محفوظة.',
     'footer.privacy': 'سياسة الخصوصية',
     'footer.terms': 'الشروط والأحكام',
@@ -270,14 +285,20 @@ const I18N = {
     'order.phone': 'رقم الهاتف',
     'order.submit': 'إرسال الطلب',
     'order.success': 'تم استلام الطلب بنجاح. سنتواصل معك قريباً.',
-    'order.error': 'تعذر إرسال الطلب. حاول مرة أخرى.'
+    'order.error': 'تعذر إرسال الطلب. حاول مرة أخرى.',
+    'blog.title': 'مدونة Officino',
+    'blog.subtitle': 'آخر التحديثات والميزات الجديدة وتحسينات المنتج.',
+    'help.title': 'مركز المساعدة',
+    'help.subtitle': 'نقوم بإعداد أدلة واضحة ومساعدة لحل المشكلات لفريقك.',
+    'help.comingSoonTitle': 'قريبًا',
+    'help.comingSoonText': 'ستتضمن هذه الصفحة أدلة الإعداد وحلول مشاكل الماسح ودعم النسخ الاحتياطي.'
   }
 };
 
 function resolveLanguage() {
   const stored = localStorage.getItem(LANG_STORAGE_KEY);
   if (SUPPORTED_LANGS.has(stored)) return stored;
-  return 'en';
+  return 'es';
 }
 
 function applyLanguage(lang) {

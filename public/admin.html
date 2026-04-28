@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -21,6 +21,7 @@
         <span>Orders</span>
         <span id="newOrdersSidebarBadge" class="badge text-bg-danger d-none">0</span>
       </button>
+      <button class="nav-pill" data-page="blog" type="button">Blog</button>
       <button class="nav-pill" data-page="activations" type="button">Activations</button>
       <button class="nav-pill" data-page="devices" type="button">Devices</button>
       <button class="nav-pill" data-page="logs" type="button">Logs</button>
@@ -180,6 +181,105 @@
         </section>
       </section>
 
+      <section class="d-none" id="adminBlogCard">
+        <section class="card shadow-sm main-list-card mb-3">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+            <h2 class="h5 mb-0">Blog Management</h2>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <form id="blogForm" class="row g-3">
+              <input type="hidden" id="blogPostId" />
+              <input type="hidden" id="blogContentHtml" />
+              <div class="col-md-8">
+                <label class="form-label">Title</label>
+                <input id="blogTitle" class="form-control" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Status</label>
+                <select id="blogStatus" class="form-select">
+                  <option value="DRAFT">Draft</option>
+                  <option value="PUBLISHED">Published</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Category</label>
+                <input id="blogCategory" class="form-control" placeholder="Productivity, Updates..." />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Read Time (min)</label>
+                <input id="blogReadTime" class="form-control" type="number" min="1" max="120" value="5" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Cover Image</label>
+                <input id="blogCoverInput" class="form-control" type="file" accept="image/*" />
+              </div>
+              <div class="col-12">
+                <input id="blogCoverUrl" class="form-control" placeholder="Cover image URL" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Summary</label>
+                <textarea id="blogSummary" class="form-control" rows="2" required></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Content</label>
+                <div id="blogEditorToolbar" class="blog-editor-toolbar">
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="h1" title="Heading 1">H1</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="h2" title="Heading 2">H2</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="h3" title="Heading 3">H3</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="bold" title="Bold"><strong>B</strong></button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="italic" title="Italic"><em>I</em></button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="underline" title="Underline"><span style="text-decoration: underline;">U</span></button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" $11.</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="ulist" title="Bullet List">UL</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="quote" title="Quote">""</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="code" title="Code Block">&lt;/&gt;</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="left" title="Align Left">L</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="center" title="Align Center">C</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="right" title="Align Right">R</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="link" title="Insert Link">Link</button>
+                  <button class="btn btn-sm btn-outline-primary editor-icon-btn" type="button" data-editor-action="image" title="Upload Image">Image+</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="image-url" title="Image URL">Img URL</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="divider" title="Divider">---</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="clear" title="Clear Format">Tx</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="undo" title="Undo">Undo</button>
+                  <button class="btn btn-sm btn-outline-secondary editor-icon-btn" type="button" data-editor-action="redo" title="Redo">Redo</button>
+                  <input id="blogInsertImageFile" type="file" accept="image/*" class="d-none" />
+                </div>
+                <div id="blogContentEditor" class="blog-editor"></div>
+                <div class="blog-editor-meta"><span id="blogWordCount">0 words</span></div>
+              </div>
+              <div class="col-12 d-flex gap-2 justify-content-end">
+                <button class="btn btn-outline-secondary" id="blogResetBtn" type="button">Reset</button>
+                <button class="btn btn-primary" id="blogSaveBtn" type="submit">Save Post</button>
+              </div>
+            </form>
+            <div id="blogResult" class="small mt-2"></div>
+          </div>
+        </section>
+
+        <section class="card shadow-sm main-list-card">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Posts</h2>
+            <button class="btn btn-outline-secondary btn-sm" id="refreshBlogBtn" type="button">Refresh</button>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="blogTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+
       <section class="d-none" id="adminLogsCard">
         <section class="card shadow-sm main-list-card">
           <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
@@ -309,7 +409,7 @@
             </div>
             <div class="col-md-4">
               <label class="form-label">Activation Key</label>
-              <input id="orderResponseKey" class="form-control" placeholder="XXXX-XXXX-XXXX-XXXX" />
+              <input id="orderResponseKey" class="form-control" placeholder="XXXX-XXXX-XXXX-XXXX" required />
             </div>
             <div class="col-12">
               <label class="form-label">Message</label>
@@ -330,6 +430,8 @@
   </div>
 
   <script src="/bootstrap.bundle.min.js"></script>
+  <script src="/vendor/tiptap.bundle.js"></script>
   <script src="/admin.js"></script>
 </body>
 </html>
+

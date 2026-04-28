@@ -7,15 +7,27 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
+    "build:tiptap": "esbuild public/vendor/tiptap.entry.js --bundle --format=iife --global-name=OfficinoTipTapBundle --outfile=public/vendor/tiptap.bundle.js",
     "reset-data": "node src/reset-data.js",
     "admin:hash": "node src/generate-admin-password-hash.js"
   },
   "dependencies": {
+    "@tiptap/core": "^3.22.5",
+    "@tiptap/extension-horizontal-rule": "^3.22.5",
+    "@tiptap/extension-image": "^3.22.5",
+    "@tiptap/extension-link": "^3.22.5",
+    "@tiptap/extension-placeholder": "^3.22.5",
+    "@tiptap/extension-text-align": "^3.22.5",
+    "@tiptap/extension-underline": "^3.22.5",
+    "@tiptap/starter-kit": "^3.22.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongodb": "^7.1.1",
     "mongoose": "^9.4.1",
     "nodemailer": "^6.9.15"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0"
   }
 }

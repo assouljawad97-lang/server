@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const { config } = require('./config');
@@ -21,6 +22,13 @@ const {
   listOrders,
   respondToOrder
 } = require('./order-service');
+const {
+  listBlogPosts,
+  getBlogPostById,
+  createBlogPost,
+  updateBlogPost,
+  deleteBlogPost
+} = require('./blog-service');
 const { isMailConfigured, sendOrderEmail } = require('./mailer');
 const { logServerEvent, readServerLogs, getLogInfo } = require('./server-logger');
 
@@ -71,6 +79,15 @@ function sanitizeText(value, maxLen) {
     .replace(/\s+/g, ' ')
     .trim();
   return cleaned.slice(0, maxLen);
+}
+
+function sanitizeHtmlContent(value, maxLen = 200000) {
+  const input = String(value || '').slice(0, maxLen);
+  return input
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/\son\w+="[^"]*"/gi, '')
+    .replace(/\son\w+='[^']*'/gi, '')
+    .replace(/javascript:/gi, '');
 }
 
 function normalizeEmail(value) {
@@ -179,6 +196,36 @@ app.get('/order', (req, res) => {
   res.sendFile(path.resolve(process.cwd(), 'public', 'order.html'));
 });
 
+app.get('/blog', (req, res) => {
+  res.sendFile(path.resolve(process.cwd(), 'public', 'blog.html'));
+});
+
+app.get('/help', (req, res) => {
+  res.sendFile(path.resolve(process.cwd(), 'public', 'help.html'));
+});
+
+app.get('/api/blogs', async (req, res) => {
+  try {
+    const posts = await listBlogPosts({ includeDraft: false });
+    res.json({ ok: true, posts });
+  } catch (error) {
+    logServerEvent('ERROR', 'blog list failed', error);
+    res.status(500).json({ ok: false, message: 'Failed to load blog posts.' });
+  }
+});
+
+app.get('/api/blogs/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id || '').trim();
+    const post = await getBlogPostById(id, { includeDraft: false });
+    if (!post) return res.status(404).json({ ok: false, message: 'Post not found.' });
+    res.json({ ok: true, post });
+  } catch (error) {
+    logServerEvent('ERROR', 'blog details failed', error);
+    res.status(500).json({ ok: false, message: 'Failed to load blog post.' });
+  }
+});
+
 app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body || {};
   const ipAddress = parseIpAddress(req);
@@ -271,8 +318,8 @@ app.post('/api/admin/orders/:id/respond', requireAdmin, async (req, res) => {
     const subject = sanitizeText(req.body?.subject, 200);
     const message = sanitizeText(req.body?.message, 4000);
     const activationKey = sanitizeText(req.body?.activationKey, 120);
-    if (!subject || !message) {
-      return res.status(400).json({ ok: false, message: 'Subject and message are required.' });
+    if (!subject || !message || !activationKey) {
+      return res.status(400).json({ ok: false, message: 'Subject, message, and activation key are required.' });
     }
     if (!isMailConfigured()) {
       return res.status(400).json({
@@ -326,6 +373,96 @@ app.post('/api/admin/orders/:id/respond', requireAdmin, async (req, res) => {
   } catch (error) {
     logServerEvent('ERROR', 'order response failed', error);
     res.status(400).json({ ok: false, message: error.message || 'Failed to respond to order.' });
+  }
+});
+
+app.get('/api/admin/blogs', requireAdmin, async (req, res) => {
+  try {
+    const posts = await listBlogPosts({ includeDraft: true });
+    res.json({ ok: true, posts });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin blog list failed', error);
+    res.status(500).json({ ok: false, message: 'Failed to load blog posts.' });
+  }
+});
+
+app.post('/api/admin/blogs', requireAdmin, async (req, res) => {
+  try {
+    const title = sanitizeText(req.body?.title, 200);
+    const category = sanitizeText(req.body?.category, 80);
+    const summary = sanitizeText(req.body?.summary, 400);
+    const contentHtml = sanitizeHtmlContent(req.body?.contentHtml, 200000).trim();
+    const coverImageUrl = sanitizeText(req.body?.coverImageUrl, 300);
+    const readingMinutes = Math.max(1, Math.min(120, Number(req.body?.readingMinutes) || 5));
+    const status = sanitizeText(req.body?.status, 20).toUpperCase() === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT';
+    if (!title || !summary || !contentHtml) {
+      return res.status(400).json({ ok: false, message: 'Title, summary, and content are required.' });
+    }
+    const post = await createBlogPost({ title, category, summary, contentHtml, coverImageUrl, readingMinutes, status, author: req.adminSession.username });
+    res.json({ ok: true, post });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin blog create failed', error);
+    res.status(400).json({ ok: false, message: error.message || 'Failed to create post.' });
+  }
+});
+
+app.put('/api/admin/blogs/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = String(req.params.id || '').trim();
+    const title = sanitizeText(req.body?.title, 200);
+    const category = sanitizeText(req.body?.category, 80);
+    const summary = sanitizeText(req.body?.summary, 400);
+    const contentHtml = sanitizeHtmlContent(req.body?.contentHtml, 200000).trim();
+    const coverImageUrl = sanitizeText(req.body?.coverImageUrl, 300);
+    const readingMinutes = Math.max(1, Math.min(120, Number(req.body?.readingMinutes) || 5));
+    const status = sanitizeText(req.body?.status, 20).toUpperCase() === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT';
+    if (!title || !summary || !contentHtml) {
+      return res.status(400).json({ ok: false, message: 'Title, summary, and content are required.' });
+    }
+    const post = await updateBlogPost(id, { title, category, summary, contentHtml, coverImageUrl, readingMinutes, status, author: req.adminSession.username });
+    res.json({ ok: true, post });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin blog update failed', error);
+    res.status(400).json({ ok: false, message: error.message || 'Failed to update post.' });
+  }
+});
+
+app.post('/api/admin/blogs/upload-image', requireAdmin, async (req, res) => {
+  try {
+    const dataUrl = String(req.body?.dataUrl || '').trim();
+    if (!dataUrl.startsWith('data:image/')) {
+      return res.status(400).json({ ok: false, message: 'Only image uploads are allowed.' });
+    }
+    const match = dataUrl.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/i);
+    if (!match) {
+      return res.status(400).json({ ok: false, message: 'Invalid image format.' });
+    }
+    const ext = match[1].toLowerCase() === 'jpeg' ? 'jpg' : match[1].toLowerCase();
+    const base64 = match[2];
+    const buffer = Buffer.from(base64, 'base64');
+    if (buffer.length > 8 * 1024 * 1024) {
+      return res.status(400).json({ ok: false, message: 'Image too large (max 8MB).' });
+    }
+    const folder = path.resolve(process.cwd(), 'public', 'uploads', 'blog');
+    fs.mkdirSync(folder, { recursive: true });
+    const fileName = `blog_${Date.now()}_${Math.floor(Math.random() * 100000)}.${ext}`;
+    const filePath = path.join(folder, fileName);
+    fs.writeFileSync(filePath, buffer);
+    res.json({ ok: true, url: `/uploads/blog/${fileName}` });
+  } catch (error) {
+    logServerEvent('ERROR', 'blog image upload failed', error);
+    res.status(400).json({ ok: false, message: error.message || 'Image upload failed.' });
+  }
+});
+
+app.delete('/api/admin/blogs/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = String(req.params.id || '').trim();
+    const result = await deleteBlogPost(id);
+    res.json({ ok: true, ...result });
+  } catch (error) {
+    logServerEvent('ERROR', 'admin blog delete failed', error);
+    res.status(400).json({ ok: false, message: error.message || 'Failed to delete post.' });
   }
 });
 
